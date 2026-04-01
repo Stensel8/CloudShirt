@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.ListStartupServices" Version="1.1.4" />
     <PackageReference Include="Ardalis.Specification" Version="9.3.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="MediatR" Version="11.1.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" Condition="'$(Configuration)'=='Release'" PrivateAssets="All" />
