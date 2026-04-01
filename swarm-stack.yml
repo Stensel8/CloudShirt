@@ -5,7 +5,12 @@ services:
   eshopwebmvc:
     image: ${DOCKER_REGISTRY}/eshopwebmvc:latest
     depends_on:
-      - sqlserver
+      - postgres
+    environment:
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     deploy:
       replicas: 1
       placement:
@@ -20,20 +25,26 @@ services:
   eshoppublicapi:
     image: ${DOCKER_REGISTRY}/eshoppublicapi:latest
     depends_on:
-      - sqlserver
+      - postgres
+    environment:
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     deploy:
       replicas: 1
       placement:
         constraints:
           - node.role == worker
 
-  sqlserver:
-    image: mcr.microsoft.com/azure-sql-edge:latest
+  postgres:
+    image: postgres:16-alpine
     environment:
-      SA_PASSWORD: "@someThingComplicated1234"
-      ACCEPT_EULA: "Y"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
     ports:
-      - "1433:1433"
+      - "5432:5432"
     deploy:
       placement:
         constraints:

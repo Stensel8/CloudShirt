@@ -9,9 +9,9 @@ public class TestParent : IEquatable<TestParent>
 {
     public int Id { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public IEnumerable<TestChild> Children { get; set; }
+    public IEnumerable<TestChild> Children { get; set; } = Enumerable.Empty<TestChild>();
 
     public bool Equals([AllowNull] TestParent other) =>
         other?.Id == Id && other?.Name == Name &&

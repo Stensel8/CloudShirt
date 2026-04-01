@@ -66,18 +66,18 @@ public class IndexModel : PageModel
 
     private string GetOrSetBasketCookieAndUserName()
     {
-        string userName = null;
+        string? userName = null;
 
-        if (Request.HttpContext.User.Identity.IsAuthenticated)
+        if (Request.HttpContext.User.Identity?.IsAuthenticated == true)
         {
-            return Request.HttpContext.User.Identity.Name;
+            return Request.HttpContext.User.Identity.Name ?? Guid.NewGuid().ToString();
         }
 
         if (Request.Cookies.ContainsKey(Constants.BASKET_COOKIENAME))
         {
             userName = Request.Cookies[Constants.BASKET_COOKIENAME];
 
-            if (!Request.HttpContext.User.Identity.IsAuthenticated)
+            if (Request.HttpContext.User.Identity?.IsAuthenticated != true)
             {
                 if (!Guid.TryParse(userName, out var _))
                 {
@@ -88,7 +88,9 @@ public class IndexModel : PageModel
         if (userName != null) return userName;
 
         userName = Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions { IsEssential = true };
+        // Secure is intentionally tied to the request protocol rather than always enforced.
+        // This project is a learning/student assignment that may run over plain HTTP.
+        var cookieOptions = new CookieOptions { IsEssential = true, Secure = Request.IsHttps, HttpOnly = true };
         cookieOptions.Expires = DateTime.Today.AddYears(10);
         Response.Cookies.Append(Constants.BASKET_COOKIENAME, userName, cookieOptions);
 

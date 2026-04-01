@@ -21,7 +21,14 @@ public class OrderController : Controller
     [HttpGet]
     public async Task<IActionResult> MyOrders()
     {
-        var viewModel = await _mediator.Send(new GetMyOrders(User.Identity.Name));
+        var identity = User.Identity;
+        var userName = identity?.Name;
+        if (identity?.IsAuthenticated != true || string.IsNullOrWhiteSpace(userName))
+        {
+            return Challenge();
+        }
+
+        var viewModel = await _mediator.Send(new GetMyOrders(userName));
 
         return View(viewModel);
     }
@@ -29,7 +36,14 @@ public class OrderController : Controller
     [HttpGet("{orderId}")]
     public async Task<IActionResult> Detail(int orderId)
     {
-        var viewModel = await _mediator.Send(new GetOrderDetails(User.Identity.Name, orderId));
+        var identity = User.Identity;
+        var userName = identity?.Name;
+        if (identity?.IsAuthenticated != true || string.IsNullOrWhiteSpace(userName))
+        {
+            return Challenge();
+        }
+
+        var viewModel = await _mediator.Send(new GetOrderDetails(userName, orderId));
 
         if (viewModel == null)
         {

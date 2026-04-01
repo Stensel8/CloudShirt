@@ -1,0 +1,35 @@
+{
+  "extends": ["config:recommended"],
+  "enabledManagers": ["azure-pipelines", "dockerfile", "docker-compose", "custom.regex"],
+  "azure-pipelines": {
+    "enabled": true
+  },
+  "docker-compose": {
+    "managerFilePatterns": [
+      "/^docker-compose\\.ya?ml$/",
+      "/^docker-compose\\.override\\.ya?ml$/",
+      "/^swarm-stack\\.ya?ml$/"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^global\\.json$/"],
+      "matchStrings": ["\\\"version\\\"\\s*:\\s*\\\"(?<currentValue>[^\\\"]+)\\\""],
+      "depNameTemplate": "dotnet-sdk",
+      "datasourceTemplate": "dotnet-version"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|\\/)dotnet-tools\\.json$/"],
+      "matchStrings": ["\\\"(?<depName>[^\\\"]+)\\\"\\s*:\\s*\\{\\s*\\\"version\\\"\\s*:\\s*\\\"(?<currentValue>[^\\\"]+)\\\""],
+      "datasourceTemplate": "nuget"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^src\\/Web\\/libman\\.json$/"],
+      "matchStrings": ["\\\"library\\\"\\s*:\\s*\\\"(?<depName>[^@\\\"]+)@(?<currentValue>[^\\\"]+)\\\""],
+      "datasourceTemplate": "cdnjs"
+    }
+  ]
+}

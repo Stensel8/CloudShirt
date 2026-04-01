@@ -1,27 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System.Net.Http;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Net.Http;
 
-namespace PublicApiIntegrationTests
+namespace PublicApiIntegrationTests;
+
+[TestClass]
+public class ProgramTest
 {
-    [TestClass]
-    public class ProgramTest
+    private static WebApplicationFactory<Microsoft.eShopWeb.PublicApi.PublicApiMarker>? _application;
+
+    public static HttpClient NewClient
     {
-        private static WebApplicationFactory<Program> _application;
-
-        public static HttpClient NewClient
+        get
         {
-            get
-            {
-                return _application.CreateClient();
-            }
+            return _application!.CreateClient();
         }
+    }
 
-        [AssemblyInitialize]
-        public static void AssemblyInitialize(TestContext _)
-        {
-            _application = new WebApplicationFactory<Program>();
+    [AssemblyInitialize]
+    public static void AssemblyInitialize(TestContext _)
+    {
+        _application = new WebApplicationFactory<Microsoft.eShopWeb.PublicApi.PublicApiMarker>();
 
-        }
     }
 }

@@ -31,19 +31,19 @@ public class Basket : ViewComponent
 
     private async Task<int> CountTotalBasketItems()
     {
-        if (_signInManager.IsSignedIn(HttpContext.User))
+        if (_signInManager.IsSignedIn(HttpContext.User) && !string.IsNullOrWhiteSpace(User.Identity?.Name))
         {
-            return await _basketService.CountTotalBasketItems(User.Identity.Name);
+            return await _basketService.CountTotalBasketItems(User.Identity!.Name!);
         }
 
-        string anonymousId = GetAnnonymousIdFromCookie();
+        string? anonymousId = GetAnnonymousIdFromCookie();
         if (anonymousId == null)
             return 0;
 
         return await _basketService.CountTotalBasketItems(anonymousId);
     }
 
-    private string GetAnnonymousIdFromCookie()
+    private string? GetAnnonymousIdFromCookie()
     {
         if (Request.Cookies.ContainsKey(Constants.BASKET_COOKIENAME))
         {

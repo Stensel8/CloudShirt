@@ -22,11 +22,11 @@ public class GetOrderDetailsHandler : IRequestHandler<GetOrderDetails, OrderView
         CancellationToken cancellationToken)
     {
         var spec = new OrderWithItemsByIdSpec(request.OrderId);
-        var order = await _orderRepository.GetBySpecAsync(spec, cancellationToken);
+        var order = await _orderRepository.FirstOrDefaultAsync(spec, cancellationToken);
 
         if (order == null)
         {
-            return null;
+            return default!;
         }
 
         return new OrderViewModel

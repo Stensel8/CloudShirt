@@ -1,11 +1,11 @@
-﻿@if (Context.User.Identity.IsAuthenticated)
+﻿@if (Context.User.Identity?.IsAuthenticated == true)
 {
     <section class="col-lg-4 col-md-5 col-xs-12">
         <div class="esh-identity">
             <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm" class="navbar-right">
                 <section class="esh-identity-section">
                     <div class="esh-identity-name">@Context.User.Identity.Name</div>
-                    <img class="esh-identity-image" src="~/images/arrow-down.png">
+                    <img class="esh-identity-image" src="~/images/arrow-down.avif">
                 </section>
                 <section class="esh-identity-drop">
                     @if (User.IsInRole("Administrators"))
@@ -27,7 +27,7 @@
                     </a>
                     <a class="esh-identity-item" href="javascript:document.getElementById('logoutForm').submit()">
                         <div class="esh-identity-name esh-identity-name--upper">Log Out</div>
-                        <img class="esh-identity-image" src="~/images/logout.png">
+                        <img class="esh-identity-image" src="~/images/logout.avif">
                     </a>
                 </section>
             </form>

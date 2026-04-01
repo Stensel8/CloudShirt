@@ -25,7 +25,7 @@ public class CachedCatalogViewModelService : ICatalogViewModelService
                 {
                     entry.SlidingExpiration = CacheHelpers.DefaultCacheDuration;
                     return await _catalogViewModelService.GetBrands();
-                });
+                }) ?? new List<SelectListItem>();
     }
 
     public async Task<CatalogIndexViewModel> GetCatalogItems(int pageIndex, int itemsPage, int? brandId, int? typeId)
@@ -36,7 +36,7 @@ public class CachedCatalogViewModelService : ICatalogViewModelService
         {
             entry.SlidingExpiration = CacheHelpers.DefaultCacheDuration;
             return await _catalogViewModelService.GetCatalogItems(pageIndex, itemsPage, brandId, typeId);
-        });
+        }) ?? new CatalogIndexViewModel();
     }
 
     public async Task<IEnumerable<SelectListItem>> GetTypes()
@@ -45,6 +45,6 @@ public class CachedCatalogViewModelService : ICatalogViewModelService
         {
             entry.SlidingExpiration = CacheHelpers.DefaultCacheDuration;
             return await _catalogViewModelService.GetTypes();
-        });
+        }) ?? new List<SelectListItem>();
     }
 }

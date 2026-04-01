@@ -11,7 +11,7 @@ public class CatalogTypeConfiguration : IEntityTypeConfiguration<CatalogType>
         builder.HasKey(ci => ci.Id);
 
         builder.Property(ci => ci.Id)
-           .UseHiLo("catalog_type_hilo")
+              .ValueGeneratedOnAdd()
            .IsRequired();
 
         builder.Property(cb => cb.Type)

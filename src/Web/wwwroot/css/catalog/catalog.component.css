@@ -1,5 +1,5 @@
 ﻿.esh-catalog-hero {
-  background-image: url("../../images/main_banner.png");
+  background-image: url("../../images/main_banner.avif");
   background-size: cover;
   height: 260px;
   width: 100%; }
@@ -43,7 +43,7 @@
     text-transform: uppercase;
     z-index: 1; }
   .esh-catalog-label::after {
-    background-image: url("../../images/arrow-down.png");
+    background-image: url("../../images/arrow-down.avif");
     content: '';
     height: 7px;
     position: absolute;

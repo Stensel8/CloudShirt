@@ -8,6 +8,6 @@ public static class UrlHelperExtensions
             action: "GET",
             controller: "ConfirmEmail",
             values: new { userId, code },
-            protocol: scheme);
+            protocol: scheme) ?? string.Empty;
     }
 }

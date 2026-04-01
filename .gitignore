@@ -212,6 +212,9 @@ UpgradeLog*.htm
 *.mdf
 *.ldf
 
+# Local SQLite data for the monolith demo
+src/local-data/
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
@@ -257,3 +260,8 @@ pub/
 
 #Ignore marker-file used to know which docker files we have.
 .eshopdocker_*
+
+# Local environment files (keep secrets out of git)
+.env
+.env.local
+/logs

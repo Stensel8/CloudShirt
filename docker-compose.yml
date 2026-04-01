@@ -1,24 +1,91 @@
-# DOCKER_REGISTRY should include a trailing slash when set, e.g., 'myregistry.com/'
+# Stap 0 - Optioneel: zet een eigen registry-prefix.
+# Voorbeeld: DOCKER_REGISTRY=myregistry.example.com/
+# Let op: altijd met een afsluitende slash (/).
 services:
+
+  # Stap 1 - Webapp (frontend)
   eshopwebmvc:
+    container_name: cloudshirt-web-frontend
     image: ${DOCKER_REGISTRY-}eshopwebmvc:latest
     build:
       context: .
       dockerfile: src/Web/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+    ports:
+      # Hostpoort 5106 -> containerpoort 80
+      - "5106:80"
+    volumes:
+      # Optioneel voor lokale dev-certificaten en secrets
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
-      - "sqlserver"
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Stap 2 - Public API (backend)
   eshoppublicapi:
+    container_name: cloudshirt-api-backend
     image: ${DOCKER_REGISTRY-}eshoppublicapi:latest
     build:
       context: .
       dockerfile: src/PublicApi/Dockerfile
-    depends_on:
-      - "sqlserver"
-  sqlserver:
-    image: mcr.microsoft.com/azure-sql-edge
-    ports:
-      - "1433:1433"
     environment:
-      - SA_PASSWORD=@someThingComplicated1234
-      - ACCEPT_EULA=Y
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+    ports:
+      # Hostpoort 5200 -> containerpoort 80
+      - "5200:80"
+    volumes:
+      # Optioneel voor lokale dev-certificaten en secrets
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/swagger > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Stap 3 - Database
+  postgres:
+    container_name: cloudshirt-db-postgres
+    image: postgres:16-alpine
+    ports:
+      # Hostpoort 5432 -> containerpoort 5432
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  postgres-data:
 

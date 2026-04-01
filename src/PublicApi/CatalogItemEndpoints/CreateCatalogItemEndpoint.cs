@@ -58,7 +58,7 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
             //  pointed out by the community. More info in this issue: https://github.com/dotnet-architecture/eShopOnWeb/issues/537 
             //  In production, we recommend uploading to a blob storage and deliver the image via CDN after a verification process.
 
-            newItem.UpdatePictureUri("eCatalog-item-default.png");
+            newItem.UpdatePictureUri("eCatalog-item-default.avif");
             await _itemRepository.UpdateAsync(newItem);
         }
 
@@ -73,6 +73,6 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
             Price = newItem.Price
         };
         response.CatalogItem = dto;
-        return Results.Created($"api/catalog-items/{dto.Id}", response);       
+        return Results.Created($"api/catalog-items/{dto.Id}", response);
     }
 }

@@ -10,31 +10,37 @@ public static class Dependencies
 {
     public static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
-        var useOnlyInMemoryDatabase = false;
-        if (configuration["UseOnlyInMemoryDatabase"] != null)
-        {
-            useOnlyInMemoryDatabase = bool.Parse(configuration["UseOnlyInMemoryDatabase"]);
-        }
+        var useOnlyInMemoryDatabase = bool.TryParse(configuration["UseOnlyInMemoryDatabase"], out var useInMemory)
+            && useInMemory;
+
+        var databaseProvider = configuration["DatabaseProvider"]?.Trim().ToLowerInvariant() ?? "postgres";
+        var catalogConnectionString = configuration.GetConnectionString("CatalogConnection");
+        var identityConnectionString = configuration.GetConnectionString("IdentityConnection");
 
         if (useOnlyInMemoryDatabase)
         {
             services.AddDbContext<CatalogContext>(c =>
                c.UseInMemoryDatabase("Catalog"));
-         
+
             services.AddDbContext<AppIdentityDbContext>(options =>
                 options.UseInMemoryDatabase("Identity"));
         }
+        else if (databaseProvider == "sqlite")
+        {
+            services.AddDbContext<CatalogContext>(c =>
+                c.UseSqlite(catalogConnectionString));
+
+            services.AddDbContext<AppIdentityDbContext>(options =>
+                options.UseSqlite(identityConnectionString));
+        }
         else
         {
-            // use real database
-            // Requires LocalDB which can be installed with SQL Server Express 2016
-            // https://www.microsoft.com/en-us/download/details.aspx?id=54284
+            // PostgreSQL blijft de container-variant voor Docker en cloud-demonstraties.
             services.AddDbContext<CatalogContext>(c =>
-                c.UseSqlServer(configuration.GetConnectionString("CatalogConnection")));
+                c.UseNpgsql(catalogConnectionString));
 
-            // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection")));
+                options.UseNpgsql(identityConnectionString));
         }
     }
 }

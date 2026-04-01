@@ -16,7 +16,7 @@ public class CheckoutModel : PageModel
     private readonly IBasketService _basketService;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IOrderService _orderService;
-    private string _username = null;
+    private string? _username;
     private readonly IBasketViewModelService _basketViewModelService;
     private readonly IAppLogger<CheckoutModel> _logger;
 
@@ -68,14 +68,14 @@ public class CheckoutModel : PageModel
 
     private async Task SetBasketModelAsync()
     {
-        if (_signInManager.IsSignedIn(HttpContext.User))
+        if (_signInManager.IsSignedIn(HttpContext.User) && !string.IsNullOrWhiteSpace(User.Identity?.Name))
         {
-            BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Identity.Name);
+            BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(User.Identity!.Name!);
         }
         else
         {
             GetOrSetBasketCookieAndUserName();
-            BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(_username);
+            BasketModel = await _basketViewModelService.GetOrCreateBasketForUser(_username ?? Guid.NewGuid().ToString());
         }
     }
 
@@ -88,7 +88,7 @@ public class CheckoutModel : PageModel
         if (_username != null) return;
 
         _username = Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions();
+        var cookieOptions = new CookieOptions { Secure = true, HttpOnly = true };
         cookieOptions.Expires = DateTime.Today.AddYears(10);
         Response.Cookies.Append(Constants.BASKET_COOKIENAME, _username, cookieOptions);
     }
