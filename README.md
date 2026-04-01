@@ -12,27 +12,84 @@ Gebruik in opdrachten:
 - Assignment 2: Docker in the Cloud
 - Assignment 3: Cloud Orchestration
 
-## 1) Oude monolithische app (.NET 10)
+## 1) Lokale .NET app (.NET 10)
 
-Dit is de klassieke CloudShirt-webapplicatie op .NET 10 (met bijbehorende API en tests).
+Deze variant draait direct op je machine met twee processen: de MVC-webapp en de Public API.
 
-### Build, run, test
+### Services en poorten (lokaal)
+
+| Service | Project | Rol | URL (HTTP/HTTPS) |
+|---|---|---|---|
+| Web | src/Web/Web.csproj | Frontend + server-side webapp | http://localhost:5000, https://localhost:5001 |
+| PublicApi | src/PublicApi/PublicApi.csproj | API + Swagger | http://localhost:5098, https://localhost:5099 |
+
+### Starten
 
 ```powershell
 dotnet restore
 dotnet build .\eShopOnWeb.sln
-dotnet run --project .\src\PublicApi\PublicApi.csproj
+dotnet run --project .\src\PublicApi\PublicApi.csproj --launch-profile PublicApi
 dotnet run --project .\src\Web\Web.csproj --launch-profile Web
+```
+
+Swagger (lokaal):
+- http://localhost:5098/swagger
+- https://localhost:5099/swagger
+
+Tests:
+
+```powershell
 dotnet test .\eShopOnWeb.sln
 ```
 
-## 2) Microservices-variant (Docker)
+## 2) Docker app (containers)
 
-Voor schaalbaarheid gebruik ik een container-setup waarmee services los uitgerold kunnen worden.
+Deze variant draait met Docker Compose en gebruikt drie containers.
+
+Belangrijk:
+- We gebruiken nu 1 compose-bestand: `docker-compose.yml`
+- Er is geen aparte override-file meer nodig
+
+### Containers en poortkoppelingen
+
+| Container (service) | Image | Rol | Poortkoppeling host -> container |
+|---|---|---|---|
+| eshopwebmvc | eshopwebmvc:latest | Webapp | 5106 -> 80 |
+| eshoppublicapi | eshoppublicapi:latest | Public API | 5200 -> 80 |
+| sqlserver | mcr.microsoft.com/azure-sql-edge | Database | 1433 -> 1433 |
+
+### Starten
+
+Stap 1 - Images bouwen:
 
 ```powershell
 docker compose build
-docker compose up
+```
+
+Stap 2 - Containers starten (op de achtergrond):
+
+```powershell
+docker compose up -d
+```
+
+Stap 3 - Controleren of alles draait:
+
+```powershell
+docker compose ps
+```
+
+Endpoints (Docker):
+- Web: http://localhost:5106
+- Public API: http://localhost:5200
+- Swagger: http://localhost:5200/swagger
+- SQL Server: localhost,1433
+
+Stoppen:
+
+Stap 4 - Alles netjes stoppen en opruimen:
+
+```powershell
+docker compose down
 ```
 
 ## Demo

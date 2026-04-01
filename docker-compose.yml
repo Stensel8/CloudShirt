@@ -1,22 +1,51 @@
-# DOCKER_REGISTRY should include a trailing slash when set, e.g., 'myregistry.com/'
+# Stap 0 - Optioneel: zet een eigen registry-prefix.
+# Voorbeeld: DOCKER_REGISTRY=myregistry.example.com/
+# Let op: altijd met een afsluitende slash (/).
 services:
+
+  # Stap 1 - Webapp (frontend)
   eshopwebmvc:
     image: ${DOCKER_REGISTRY-}eshopwebmvc:latest
     build:
       context: .
       dockerfile: src/Web/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      # Hostpoort 5106 -> containerpoort 80
+      - "5106:80"
+    volumes:
+      # Optioneel voor lokale dev-certificaten en secrets
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
       - "sqlserver"
+
+  # Stap 2 - Public API (backend)
   eshoppublicapi:
     image: ${DOCKER_REGISTRY-}eshoppublicapi:latest
     build:
       context: .
       dockerfile: src/PublicApi/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      # Hostpoort 5200 -> containerpoort 80
+      - "5200:80"
+    volumes:
+      # Optioneel voor lokale dev-certificaten en secrets
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
       - "sqlserver"
+
+  # Stap 3 - Database
   sqlserver:
     image: mcr.microsoft.com/azure-sql-edge
     ports:
+      # Hostpoort 1433 -> containerpoort 1433
       - "1433:1433"
     environment:
       - SA_PASSWORD=@someThingComplicated1234
