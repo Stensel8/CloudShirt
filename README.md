@@ -12,6 +12,20 @@ Gebruik in opdrachten:
 - Assignment 2: Docker in the Cloud
 - Assignment 3: Cloud Orchestration
 
+## Snelle Start (aanrader)
+
+Gebruik de scripts in de map scripts:
+
+```powershell
+.\scripts\run-dotnet.ps1
+```
+
+```powershell
+.\scripts\run-docker.ps1
+```
+
+Deze scripts gebruiken de waarden uit .env (of maken die aan vanuit .env.example).
+
 ## 1) Lokale .NET app (.NET 10)
 
 Deze variant draait direct op je machine met twee processen: de MVC-webapp en de Public API.
@@ -26,10 +40,7 @@ Deze variant draait direct op je machine met twee processen: de MVC-webapp en de
 ### Starten
 
 ```powershell
-dotnet restore
-dotnet build .\eShopOnWeb.sln
-dotnet run --project .\src\PublicApi\PublicApi.csproj --launch-profile PublicApi
-dotnet run --project .\src\Web\Web.csproj --launch-profile Web
+.\scripts\run-dotnet.ps1
 ```
 
 Swagger (lokaal):
@@ -47,8 +58,9 @@ dotnet test .\eShopOnWeb.sln
 Deze variant draait met Docker Compose en gebruikt drie containers.
 
 Belangrijk:
-- We gebruiken nu 1 compose-bestand: `docker-compose.yml`
+- We gebruiken nu 1 compose-bestand: docker-compose.yml
 - Er is geen aparte override-file meer nodig
+- Database draait op PostgreSQL
 
 ### Containers en poortkoppelingen
 
@@ -56,33 +68,25 @@ Belangrijk:
 |---|---|---|---|
 | eshopwebmvc | eshopwebmvc:latest | Webapp | 5106 -> 80 |
 | eshoppublicapi | eshoppublicapi:latest | Public API | 5200 -> 80 |
-| sqlserver | mcr.microsoft.com/azure-sql-edge | Database | 1433 -> 1433 |
+| postgres | postgres:16-alpine | Database | 5432 -> 5432 |
 
 ### Starten
 
-Stap 1 - Images bouwen:
-
 ```powershell
-docker compose build
+.\scripts\run-docker.ps1
 ```
 
-Stap 2 - Containers starten (op de achtergrond):
+Handmatig kan ook:
 
 ```powershell
-docker compose up -d
-```
-
-Stap 3 - Controleren of alles draait:
-
-```powershell
-docker compose ps
+docker compose up -d --build --remove-orphans
 ```
 
 Endpoints (Docker):
 - Web: http://localhost:5106
 - Public API: http://localhost:5200
 - Swagger: http://localhost:5200/swagger
-- SQL Server: localhost,1433
+- PostgreSQL: localhost:5432
 
 Stoppen:
 
@@ -91,6 +95,16 @@ Stap 4 - Alles netjes stoppen en opruimen:
 ```powershell
 docker compose down
 ```
+
+## Wanneer gebruik je welke variant?
+
+- Lokale .NET variant:
+	Snelste feedback tijdens ontwikkelen en debuggen in Visual Studio/VS Code.
+	Draait direct op je machine met de PostgreSQL container als database.
+
+- Docker variant:
+	Beste keuze voor integratietests, demo's en cloud-achtige runtimetests.
+	Zelfde service-opzet als beoogde container-deployment (Web + PublicApi + PostgreSQL).
 
 ## Demo
 
