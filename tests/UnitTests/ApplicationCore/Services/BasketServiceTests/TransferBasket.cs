@@ -38,12 +38,12 @@ public class TransferBasket
     {
         var anonymousBasket = null as Basket;
         var userBasket = new Basket(_existentUserBasketBuyerId);
-        _mockBasketRepo.SetupSequence(x => x.GetBySpecAsync(It.IsAny<BasketWithItemsSpecification>(), default))
+        _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
         var basketService = new BasketService(_mockBasketRepo.Object, null);
         await basketService.TransferBasketAsync(_nonexistentAnonymousBasketBuyerId, _existentUserBasketBuyerId);
-        _mockBasketRepo.Verify(x => x.GetBySpecAsync(It.IsAny<BasketWithItemsSpecification>(), default), Times.Once);
+        _mockBasketRepo.Verify(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default), Times.Once);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class TransferBasket
         var userBasket = new Basket(_existentUserBasketBuyerId);
         userBasket.AddItem(1, 10, 4);
         userBasket.AddItem(2, 99, 3);
-        _mockBasketRepo.SetupSequence(x => x.GetBySpecAsync(It.IsAny<BasketWithItemsSpecification>(), default))
+        _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
         var basketService = new BasketService(_mockBasketRepo.Object, null);
@@ -72,7 +72,7 @@ public class TransferBasket
     {
         var anonymousBasket = new Basket(_existentAnonymousBasketBuyerId);
         var userBasket = new Basket(_existentUserBasketBuyerId);
-        _mockBasketRepo.SetupSequence(x => x.GetBySpecAsync(It.IsAny<BasketWithItemsSpecification>(), default))
+        _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
         var basketService = new BasketService(_mockBasketRepo.Object, null);
@@ -86,7 +86,7 @@ public class TransferBasket
     {
         var anonymousBasket = new Basket(_existentAnonymousBasketBuyerId);
         var userBasket = null as Basket;
-        _mockBasketRepo.SetupSequence(x => x.GetBySpecAsync(It.IsAny<BasketWithItemsSpecification>(), default))
+        _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
         var basketService = new BasketService(_mockBasketRepo.Object, null);
