@@ -23,8 +23,6 @@ builder.Logging.AddConsole();
 
 Microsoft.eShopWeb.Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
 
-builder.Services.AddCookieSettings();
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -38,6 +36,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
            .AddEntityFrameworkStores<AppIdentityDbContext>()
            .AddDefaultTokenProviders();
+
+// Configure cookie paths after AddIdentity so Identity defaults are overridden.
+builder.Services.AddCookieSettings();
 
 builder.Services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
 
