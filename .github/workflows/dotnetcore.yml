@@ -1,22 +1,204 @@
-name: eShopOnWeb Build and Test
+name: CloudShirt CI
 
-on: [push, pull_request, workflow_dispatch]
+# Deze workflow valideert pull requests en branch pushes op twee vlakken:
+# 1) Native .NET 10 restore/build/test
+# 2) Docker image builds plus kwetsbaarheidsscans
+on:
+  push:
+    branches: ["main", "NET-10"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  # Kwaliteitspoort voor de volledige solution op .NET 10.
+  dotnet10-build-test:
+    name: .NET 10 Build and Test
+    runs-on: ubuntu-latest
+    outputs:
+      build_warnings: ${{ steps.collect.outputs.build_warnings }}
+      test_warnings: ${{ steps.collect.outputs.test_warnings }}
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore solution
+        run: dotnet restore ./eShopOnWeb.sln
+
+      - name: Build solution
+        run: dotnet build ./eShopOnWeb.sln --configuration Release --no-restore 2>&1 | tee build.log
+
+      - name: Test solution
+        run: dotnet test ./eShopOnWeb.sln --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" 2>&1 | tee test.log
+
+      # Waarschuwingentellingen beschikbaar maken voor de PR-samenvatting.
+      # Waarschuwingen zijn hier informatief, zodat beleid stapsgewijs strenger kan.
+      - name: Collect warning counts
+        id: collect
+        shell: bash
+        run: |
+          build_warnings=$(grep -E " warning [A-Z]{2,}[0-9]{4}" build.log | wc -l || true)
+          test_warnings=$(grep -E " warning [A-Z]{2,}[0-9]{4}" test.log | wc -l || true)
+          echo "build_warnings=${build_warnings}" >> "$GITHUB_OUTPUT"
+          echo "test_warnings=${test_warnings}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload build and test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          # Houdt CI-logs en testoutput beschikbaar vanuit de workflow-run.
+          name: dotnet10-logs
+          path: |
+            build.log
+            test.log
+            **/*.trx
+
+  # Container-kwaliteitspoort: controleer Dockerfiles/compose build en voer securityscans uit.
+  docker-build-security:
+    name: Docker Build and Security
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '6.0.x'
-        include-prerelease: true
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Build with dotnet
-      run: dotnet build ./eShopOnWeb.sln --configuration Release
-    
-    - name: Test with dotnet
-      run: dotnet test ./eShopOnWeb.sln --configuration Release
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/Web/Dockerfile
+          push: false
+          load: true
+          tags: cloudshirt-web:ci
+
+      - name: Build PublicApi image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./src/PublicApi/Dockerfile
+          push: false
+          load: true
+          tags: cloudshirt-publicapi:ci
+
+      - name: Build compose stack
+        run: docker compose -f docker-compose.yml build
+
+      # Officieel action-tagformaat zodat Dependabot automatisch bump-PR's kan maken.
+      - name: Scan repository filesystem (Trivy)
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+
+      - name: Scan Web image (Trivy)
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: image
+          image-ref: cloudshirt-web:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+
+      - name: Scan PublicApi image (Trivy)
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: image
+          image-ref: cloudshirt-publicapi:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+
+  # Plaatst per PR één updatebare botcomment met een snelle CI-samenvatting voor de auteur.
+  pr-feedback:
+    name: PR Feedback Bot
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs:
+      - dotnet10-build-test
+      - docker-build-security
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Post CI summary comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Vaste marker zodat reruns dezelfde comment bijwerken in plaats van extra ruis te maken.
+            const marker = '<!-- cloudshirt-ci-feedback -->';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+            const author = context.payload.pull_request.user.login;
+
+            const dotnetResult = '${{ needs.dotnet10-build-test.result }}';
+            const dockerResult = '${{ needs.docker-build-security.result }}';
+            const buildWarnings = '${{ needs.dotnet10-build-test.outputs.build_warnings || '0' }}';
+            const testWarnings = '${{ needs.dotnet10-build-test.outputs.test_warnings || '0' }}';
+
+            let intro = `Hey @${author}, let even op. Je hebt een paar kleine zaken waar je nog even op moet letten.`;
+
+            if (dotnetResult === 'success' && dockerResult === 'success' && buildWarnings === '0' && testWarnings === '0') {
+              intro = `Hey @${author}, netjes. .NET 10 en Docker checks zijn groen zonder gevonden warnings.`;
+            }
+
+            const body = [
+              marker,
+              '## CI feedback',
+              '',
+              intro,
+              '',
+              `- .NET 10 build/test: ${dotnetResult}`,
+              `- Docker build/security: ${dockerResult}`,
+              `- Build warnings: ${buildWarnings}`,
+              `- Test warnings: ${testWarnings}`,
+              '',
+              'Als een check failed is, open de job logs in GitHub Actions en pak de melding daar direct op.'
+            ].join('\n');
+
+            // Lees bestaande comments en werk waar mogelijk dezelfde comment bij.
+            const comments = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100
+            });
+
+            const existing = comments.data.find(
+              (c) => c.user?.login === 'github-actions[bot]' && c.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body
+              });
+            }
