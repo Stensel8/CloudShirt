@@ -1,9 +1,0 @@
-window.learnWiseSetup = {
-  host: 'https://aiden.learnwise.ai',
-  chatSrc: 'https://chat.learnwise.ai',
-  assistantId: 'soNZptG42TfM',
-};
-
-var script = document.createElement('script');
-script.src = window.learnWiseSetup.host + '/chat_launcher.js';
-document.head.appendChild(script);

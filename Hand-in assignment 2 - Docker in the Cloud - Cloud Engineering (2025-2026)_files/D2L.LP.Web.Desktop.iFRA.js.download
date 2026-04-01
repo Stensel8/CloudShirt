@@ -1,1 +1,0 @@
-D2L.LP.Web.UI.iFRA={Plugins:{}};D2L.LP.Web.UI.iFRA.Plugins.LanguageTerminology=function(terminology){return function(host){host.onRequest('lang-terminology',terminology);};};

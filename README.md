@@ -1,63 +1,81 @@
 # CloudShirt
 
-CloudShirt is a .NET 10 sample ecommerce app based on the eShopOnWeb reference architecture. The solution includes the main Web app, a PublicApi service, Blazor admin components, and unit/integration/functional tests.
+> Implementatierepository voor de Cloud Engineering-specialisatie (Cloud Automation Concepts)
 
-## Cloud Engineering Assignment Sync
+## Over deze repository
 
-This repository is the implementation base used by the Cloud Automation Concepts module in the Cloud Engineering specialization.
+CloudShirt bevat de applicatie en infrastructuur-artefacten die gebruikt worden binnen de drie assignmentfases van het vak Cloud Automation Concepts.
 
-- Module README: https://github.com/Stensel8/cloud-engineering/blob/main/cloud-automation-concepts/README.md
-- CloudShirt must stay in sync with the three assignment stages documented there.
+Deze applicatie is oorspronkelijk gebaseerd op de eShopOnWeb-variant van een Saxion-docent en is daarna door mij (Stensel8) omgebouwd en gemoderniseerd voor gebruik binnen de Cloud Engineering-opdrachten.
 
-### Exported hand-ins (present in this repo)
+Deze repository is gekoppeld aan:
+- https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts
 
-1. Assignment 1 - AWS Basics
-	- [Hand-in assignment 1 - AWS basics - Cloud Engineering (2025-2026).html](Hand-in%20assignment%201%20-%20AWS%20basics%20-%20Cloud%20Engineering%20%282025-2026%29.html)
-2. Assignment 2 - Docker in the Cloud
-	- [Hand-in assignment 2 - Docker in the Cloud - Cloud Engineering (2025-2026).html](Hand-in%20assignment%202%20-%20Docker%20in%20the%20Cloud%20-%20Cloud%20Engineering%20%282025-2026%29.html)
-3. Assignment 3 - Cloud Orchestration
-	- [Hand-in assignment 3 - Cloud orchestration - Cloud Engineering (2025-2026).html](Hand-in%20assignment%203%20-%20Cloud%20orchestration%20-%20Cloud%20Engineering%20%282025-2026%29.html)
+## Koppeling met Cloud Automation Concepts
 
-## Current stack
+In Cloud Automation Concepts gebruik ik CloudShirt als de kernapplicatie om requirements per assignmentfase uit te werken en af te vinken.
+
+- Assignment 1: AWS Basics
+- Assignment 2: Docker in the Cloud
+- Assignment 3: Cloud Orchestration
+
+Cross-referentie:
+- Deze repository (CloudShirt) bevat de applicatie + deploymentartefacten.
+- De module-repository bevat de opdrachtcontext, leerdoelen en requirement-overzicht.
+
+## Inleverfasen (koppeling met cloud-automation-concepts)
+
+1. Assignment 1: AWS Basics
+   - Focus: basisinfrastructuur en AWS-resources via IaC
+2. Assignment 2: Docker in the Cloud
+   - Focus: containerisatie, build/deploy-flow en Swarm
+3. Assignment 3: Cloud Orchestration
+   - Focus: orchestration en multi-cloud deployment
+
+> Opmerking: Brightspace-exportbestanden (HTML) horen niet in deze repository en worden niet als bron van bewijs gebruikt.
+
+## Technische stack
 
 - .NET 10 (`net10.0`)
 - ASP.NET Core MVC, Razor Pages, Blazor WebAssembly
-- Entity Framework Core with SQL Server or in-memory storage for development
-- Dockerized Web and PublicApi services
+- Entity Framework Core (SQL Server of InMemory voor development)
+- Docker Compose + Swarm stack (voor assignment-context)
 
-## Demo
+## Build, Run, Test
 
-<video src="Short-Demo.webm" controls playsinline width="100%"></video>
-
-The original `Short-Demo.mp4` is kept in the repository, but the WebM version is the preferred compact format for display.
-
-## Run locally
+### Build
 
 ```powershell
 dotnet restore
 dotnet build .\eShopOnWeb.sln
+```
+
+### Run
+
+```powershell
 dotnet run --project .\src\PublicApi\PublicApi.csproj
 dotnet run --project .\src\Web\Web.csproj --launch-profile Web
 ```
 
-The web app is available at `https://localhost:5001/`. If you run against a persistent SQL Server database, apply the EF Core migrations first.
+Web draait standaard op `https://localhost:5001/`.
 
-## Docker
+### Test
+
+```powershell
+dotnet test .\eShopOnWeb.sln
+```
+
+## Containers
 
 ```powershell
 docker-compose build
 docker-compose up
 ```
 
-## Tests
+De `swarm-stack.yml` blijft bewust onderdeel van deze repo, omdat de opdrachten binnen Cloud Engineering hiervan afhankelijk zijn.
 
-```powershell
-dotnet test .\eShopOnWeb.sln
-```
+## Demo
 
-## Notes
+<video src="Short-Demo.webm" controls playsinline width="100%"></video>
 
-- The repo has been modernized to .NET 10 and current Docker base images.
-- A short modernization log is available in [MODERNIZATION_IMPROVEMENTS.md](MODERNIZATION_IMPROVEMENTS.md).
-- This repository is intentionally kept as a dependency for the assignments in [cloud-engineering](https://github.com/Stensel8/cloud-engineering).
-- The Docker Swarm stack remains part of the repo because those assignments still depend on it.
+`Short-Demo.mp4` blijft als bronbestand aanwezig; `Short-Demo.webm` is de efficiënte variant voor weergave in de repository.
