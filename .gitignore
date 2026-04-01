@@ -264,3 +264,4 @@ pub/
 # Local environment files (keep secrets out of git)
 .env
 .env.local
+/logs
