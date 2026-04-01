@@ -12,7 +12,7 @@ Gebruik in opdrachten:
 - Assignment 2: Docker in the Cloud
 - Assignment 3: Cloud Orchestration
 
-## Snelle Start (aanrader)
+## Starten en stoppen
 
 Gebruik de scripts in de map scripts:
 
