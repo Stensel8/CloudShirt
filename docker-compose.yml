@@ -2,14 +2,14 @@ version: '3.4'
 
 services:
   eshopwebmvc:
-    image: ${DOCKER_REGISTRY-}eshopwebmvc
+    image: ${DOCKER_REGISTRY}/eshopwebmvc:latest
     build:
       context: .
       dockerfile: src/Web/Dockerfile
     depends_on:
       - "sqlserver"
   eshoppublicapi:
-    image: ${DOCKER_REGISTRY-}eshoppublicapi
+    image: ${DOCKER_REGISTRY}/eshoppublicapi:latest
     build:
       context: .
       dockerfile: src/PublicApi/Dockerfile

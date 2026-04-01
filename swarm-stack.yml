@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+
+  eshopwebmvc:
+    image: ${DOCKER_REGISTRY}/eshopwebmvc:latest
+    depends_on:
+      - sqlserver
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+    ports:
+      - target: 80
+        published: 5601
+        protocol: tcp
+        mode: host
+
+  eshoppublicapi:
+    image: ${DOCKER_REGISTRY}/eshoppublicapi:latest
+    depends_on:
+      - sqlserver
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+
+  sqlserver:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    environment:
+      SA_PASSWORD: "@someThingComplicated1234"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
