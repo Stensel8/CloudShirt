@@ -257,3 +257,7 @@ pub/
 
 #Ignore marker-file used to know which docker files we have.
 .eshopdocker_*
+
+# Local environment files (keep secrets out of git)
+.env
+.env.local

@@ -10,11 +10,10 @@ public static class Dependencies
 {
     public static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
-        var useOnlyInMemoryDatabase = false;
-        if (configuration["UseOnlyInMemoryDatabase"] != null)
-        {
-            useOnlyInMemoryDatabase = bool.Parse(configuration["UseOnlyInMemoryDatabase"]);
-        }
+        var useOnlyInMemoryDatabase = bool.TryParse(configuration["UseOnlyInMemoryDatabase"], out var useInMemory)
+            && useInMemory;
+
+        var databaseProvider = configuration["DatabaseProvider"]?.Trim().ToLowerInvariant() ?? "postgres";
 
         if (useOnlyInMemoryDatabase)
         {
@@ -26,15 +25,18 @@ public static class Dependencies
         }
         else
         {
-            // use real database
-            // Requires LocalDB which can be installed with SQL Server Express 2016
-            // https://www.microsoft.com/en-us/download/details.aspx?id=54284
-            services.AddDbContext<CatalogContext>(c =>
-                c.UseSqlServer(configuration.GetConnectionString("CatalogConnection")));
+            var catalogConnectionString = configuration.GetConnectionString("CatalogConnection");
+            var identityConnectionString = configuration.GetConnectionString("IdentityConnection");
 
-            // Add Identity DbContext
+            // PostgreSQL is the default relational runtime for Docker/Swarm/AWS readiness.
+            // Keep the provider key to support future extension without changing config shape.
+            _ = databaseProvider;
+
+            services.AddDbContext<CatalogContext>(c =>
+                c.UseNpgsql(catalogConnectionString));
+
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection")));
+                options.UseNpgsql(identityConnectionString));
         }
     }
 }

@@ -10,8 +10,12 @@ services:
       context: .
       dockerfile: src/Web/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://+:80
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     ports:
       # Hostpoort 5106 -> containerpoort 80
       - "5106:80"
@@ -20,7 +24,8 @@ services:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
-      - "sqlserver"
+      postgres:
+        condition: service_healthy
 
   # Stap 2 - Public API (backend)
   eshoppublicapi:
@@ -29,8 +34,12 @@ services:
       context: .
       dockerfile: src/PublicApi/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://+:80
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     ports:
       # Hostpoort 5200 -> containerpoort 80
       - "5200:80"
@@ -39,15 +48,29 @@ services:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
-      - "sqlserver"
+      postgres:
+        condition: service_healthy
 
   # Stap 3 - Database
-  sqlserver:
-    image: mcr.microsoft.com/azure-sql-edge
+  postgres:
+    image: postgres:16-alpine
     ports:
-      # Hostpoort 1433 -> containerpoort 1433
-      - "1433:1433"
+      # Hostpoort 5432 -> containerpoort 5432
+      - "5432:5432"
     environment:
-      - SA_PASSWORD=@someThingComplicated1234
-      - ACCEPT_EULA=Y
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  postgres-data:
 

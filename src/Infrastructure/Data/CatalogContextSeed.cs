@@ -16,9 +16,10 @@ public class CatalogContextSeed
         var retryForAvailability = retry;
         try
         {
-            if (catalogContext.Database.IsSqlServer())
+            if (catalogContext.Database.IsRelational())
             {
-                catalogContext.Database.Migrate();
+                // Transitional path while SQL Server migrations are still present.
+                await catalogContext.Database.EnsureCreatedAsync();
             }
 
             if (!await catalogContext.CatalogBrands.AnyAsync())
@@ -51,7 +52,7 @@ public class CatalogContextSeed
 
             retryForAvailability++;
 
-            logger.LogError(ex.Message);
+            logger.LogError(ex, "Error while seeding catalog context");
             await SeedAsync(catalogContext, logger, retryForAvailability);
             throw;
         }
