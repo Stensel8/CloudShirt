@@ -88,7 +88,7 @@ public class CheckoutModel : PageModel
         if (_username != null) return;
 
         _username = Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions();
+        var cookieOptions = new CookieOptions { Secure = true, HttpOnly = true };
         cookieOptions.Expires = DateTime.Today.AddYears(10);
         Response.Cookies.Append(Constants.BASKET_COOKIENAME, _username, cookieOptions);
     }

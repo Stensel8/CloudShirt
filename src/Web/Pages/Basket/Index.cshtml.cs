@@ -88,7 +88,7 @@ public class IndexModel : PageModel
         if (userName != null) return userName;
 
         userName = Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions { IsEssential = true };
+        var cookieOptions = new CookieOptions { IsEssential = true, Secure = true, HttpOnly = true };
         cookieOptions.Expires = DateTime.Today.AddYears(10);
         Response.Cookies.Append(Constants.BASKET_COOKIENAME, userName, cookieOptions);
 
