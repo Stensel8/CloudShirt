@@ -37,14 +37,14 @@ function Import-DotEnv {
 }
 
 function Stop-CloudShirtDotNetProcesses {
-    $processes = Get-CimInstance Win32_Process | Where-Object {
+    $processes = @(Get-CimInstance Win32_Process | Where-Object {
         $_.Name -eq 'dotnet.exe' -and (
             $_.CommandLine -like '*src\PublicApi\PublicApi.csproj*' -or
             $_.CommandLine -like '*src/PublicApi/PublicApi.csproj*' -or
             $_.CommandLine -like '*src\Web\Web.csproj*' -or
             $_.CommandLine -like '*src/Web/Web.csproj*'
         )
-    }
+    })
 
     if ($processes.Count -gt 0) {
         Write-Output "Deze applicatie draait al. Wordt nu geherstart...."
@@ -87,6 +87,9 @@ try {
 
     $catalogDb = Join-Path $localDataDir "cloudshirt-catalog.db"
     $identityDb = Join-Path $localDataDir "cloudshirt-identity.db"
+
+    Write-Section "Database modus"
+    Write-Output "Volledig lokale monolithische modus (SQLite, zonder Docker)."
 
     $env:DatabaseProvider = 'sqlite'
     $env:UseOnlyInMemoryDatabase = 'false'

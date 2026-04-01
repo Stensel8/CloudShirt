@@ -1,11 +1,11 @@
-﻿using Microsoft.OpenApi;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Microsoft.eShopWeb.PublicApi;
 
 public class CustomSchemaFilters : ISchemaFilter
 {
-    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
         var excludeProperties = new[] { "CorrelationId" };
 

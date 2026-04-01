@@ -22,8 +22,8 @@ function Write-Section {
 }
 
 function Test-CloudShirtDockerRunning {
-    $runningServices = docker compose ps --status running --services 2>$null |
-        Where-Object { $_ -and $_.Trim().Length -gt 0 }
+    $runningServices = @(docker compose ps --status running --services 2>$null |
+        Where-Object { $_ -and $_.Trim().Length -gt 0 })
 
     return $runningServices.Count -gt 0
 }

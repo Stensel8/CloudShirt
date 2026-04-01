@@ -5,6 +5,7 @@ services:
 
   # Stap 1 - Webapp (frontend)
   eshopwebmvc:
+    container_name: cloudshirt-web-frontend
     image: ${DOCKER_REGISTRY-}eshopwebmvc:latest
     build:
       context: .
@@ -26,9 +27,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   # Stap 2 - Public API (backend)
   eshoppublicapi:
+    container_name: cloudshirt-api-backend
     image: ${DOCKER_REGISTRY-}eshoppublicapi:latest
     build:
       context: .
@@ -50,9 +58,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/swagger > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   # Stap 3 - Database
   postgres:
+    container_name: cloudshirt-db-postgres
     image: postgres:16-alpine
     ports:
       # Hostpoort 5432 -> containerpoort 5432

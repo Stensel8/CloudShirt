@@ -29,10 +29,38 @@ function Write-Section {
 }
 
 function Test-CloudShirtDockerRunning {
-    $runningServices = docker compose ps --status running --services 2>$null |
-        Where-Object { $_ -and $_.Trim().Length -gt 0 }
+    $runningServices = @(docker compose ps --status running --services 2>$null |
+        Where-Object { $_ -and $_.Trim().Length -gt 0 })
 
     return $runningServices.Count -gt 0
+}
+
+function Test-EndpointWithRetry {
+    param(
+        [string]$Name,
+        [string]$Url,
+        [int]$MaxWaitSeconds = 45,
+        [int]$IntervalSeconds = 2
+    )
+
+    $lastError = "Onbekende fout."
+    $startedAt = Get-Date
+
+    while (((Get-Date) - $startedAt).TotalSeconds -lt $MaxWaitSeconds) {
+        try {
+            $response = Invoke-WebRequest -UseBasicParsing $Url -TimeoutSec 8
+            $elapsed = [int]((Get-Date) - $startedAt).TotalSeconds
+            Write-Host "${Name}: $($response.StatusCode) (na ${elapsed}s)"
+            return $true
+        }
+        catch {
+            $lastError = $_.Exception.Message
+            Start-Sleep -Seconds $IntervalSeconds
+        }
+    }
+
+    Write-Host "$Name check mislukt na ${MaxWaitSeconds}s: $lastError"
+    return $false
 }
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -67,24 +95,17 @@ try {
 
     Write-Section "Endpoint checks"
 
-    try {
-        $apiStatus = (Invoke-WebRequest -UseBasicParsing "http://localhost:5200/swagger" -TimeoutSec 15).StatusCode
-        Write-Output "PublicApi Swagger: $apiStatus"
-    }
-    catch {
-        Write-Output "PublicApi Swagger check mislukt: $($_.Exception.Message)"
-    }
-
-    try {
-        $webStatus = (Invoke-WebRequest -UseBasicParsing "http://localhost:5106" -TimeoutSec 15).StatusCode
-        Write-Output "Web: $webStatus"
-    }
-    catch {
-        Write-Output "Web check mislukt: $($_.Exception.Message)"
-    }
+    $apiReady = Test-EndpointWithRetry -Name "PublicApi Swagger" -Url "http://localhost:5200/swagger"
+    $webReady = Test-EndpointWithRetry -Name "Web" -Url "http://localhost:5106"
 
     Write-Section "Klaar"
-    Write-Output "Docker-modus gestart."
+    if ($apiReady -and $webReady) {
+        Write-Output "Docker-modus gestart en endpoints zijn bereikbaar."
+    }
+    else {
+        Write-Output "Docker-modus gestart, maar niet alle endpoints zijn al bereikbaar."
+        Write-Output "Tip: bekijk logs met: docker compose logs --tail=100"
+    }
     Write-Output "- Web: http://localhost:5106"
     Write-Output "- PublicApi Swagger: http://localhost:5200/swagger"
 }

@@ -24,6 +24,11 @@ RUN dotnet publish Web.csproj -c Release -o /app/publish --no-restore
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
+# Healthchecks in docker-compose rely on curl being present.
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends curl \
+	&& rm -rf /var/lib/apt/lists/*
+
 # Stap 6 - Neem alleen de gepubliceerde output mee naar de runtime-container.
 COPY --from=build /app/publish ./
 

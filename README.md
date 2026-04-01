@@ -24,7 +24,18 @@ Gebruik de scripts in de map scripts:
 .\scripts\run-docker.ps1
 ```
 
+Stoppen:
+
+```powershell
+.\scripts\stop-dotnet.ps1
+```
+
+```powershell
+.\scripts\stop-docker.ps1
+```
+
 Deze scripts gebruiken de waarden uit .env (of maken die aan vanuit .env.example).
+Als een variant al draait, geven de run-scripts een herstartmelding en starten opnieuw op.
 
 ## 1) Lokale .NET app (.NET 10)
 
@@ -56,6 +67,11 @@ Microservices-variant. Draait met Docker Compose en PostgreSQL.
 
 - Lokale .NET variant: monolithisch, snel testen, data in SQLite.
 - Docker variant: microservices, dichter bij deployment, data in PostgreSQL.
+
+## Data en state
+
+- SQLite (lokale .NET) en PostgreSQL (Docker) delen niet automatisch dezelfde data/state.
+- Bij wisselen van modus start je dus met de state van de bijbehorende database.
 
 ## Demo
 
