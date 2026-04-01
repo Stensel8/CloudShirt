@@ -12,7 +12,11 @@ Gebruik in opdrachten:
 - Assignment 2: Docker in the Cloud
 - Assignment 3: Cloud Orchestration
 
-## Build, Run, Test
+## 1) Oude monolithische app (.NET 10)
+
+Dit is de klassieke CloudShirt-webapplicatie op .NET 10 (met bijbehorende API en tests).
+
+### Build, run, test
 
 ```powershell
 dotnet restore
@@ -22,13 +26,22 @@ dotnet run --project .\src\Web\Web.csproj --launch-profile Web
 dotnet test .\eShopOnWeb.sln
 ```
 
+## 2) Microservices-variant (Docker)
+
+Voor schaalbaarheid gebruik ik een container-setup waarmee services los uitgerold kunnen worden.
+
+```powershell
+docker compose build
+docker compose up
+```
+
 ## Demo
 
 <video src="Short-Demo.webm" controls playsinline width="100%"></video>
 
-## Containers
+[Bekijk demo (WebM)](Short-Demo.webm)
 
-```powershell
-docker-compose build
-docker-compose up
-```
+## Credits
+
+- Originele upstream: https://github.com/dotnet-architecture/eShopOnWeb
+- Fork-basis voor deze variant: https://github.com/looking4ward/CloudShirt
