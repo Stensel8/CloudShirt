@@ -3,27 +3,18 @@
     Start CloudShirt in lokale .NET-modus.
 
 .DESCRIPTION
-    Start de PublicApi en Web als losse .NET-processen op je machine.
-    De database draait via de PostgreSQL-container uit docker-compose.
+    Start CloudShirt lokaal als monolithische .NET-app met SQLite.
+    De app draait zonder Docker-application containers en bewaart data in lokale SQLite-bestanden.
 
     Dit script:
     1. Controleert vereiste tools
     2. Laadt variabelen uit .env (of maakt .env vanuit .env.example)
-    3. Start optioneel PostgreSQL
-    4. Start PublicApi en Web in aparte PowerShell-vensters
-
-.PARAMETER SkipPostgres
-    Slaat het starten van de PostgreSQL-container over.
+    3. Bouwt de Web-app
+    4. Start Web als achtergrondproces met logbestand
 
 .EXAMPLE
     .\scripts\run-dotnet.ps1
-    .\scripts\run-dotnet.ps1 -SkipPostgres
 #>
-
-[CmdletBinding()]
-param(
-    [switch]$SkipPostgres
-)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -45,6 +36,22 @@ function Import-DotEnv {
         }
 }
 
+function Stop-CloudShirtDotNetProcesses {
+    $processes = Get-CimInstance Win32_Process | Where-Object {
+        $_.Name -eq 'dotnet.exe' -and (
+            $_.CommandLine -like '*src\PublicApi\PublicApi.csproj*' -or
+            $_.CommandLine -like '*src/PublicApi/PublicApi.csproj*' -or
+            $_.CommandLine -like '*src\Web\Web.csproj*' -or
+            $_.CommandLine -like '*src/Web/Web.csproj*'
+        )
+    }
+
+    foreach ($process in $processes) {
+        Write-Output "Oude CloudShirt-processen stoppen: PID $($process.ProcessId)"
+        Stop-Process -Id $process.ProcessId -Force
+    }
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 
@@ -56,12 +63,7 @@ try {
         exit 1
     }
 
-    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        Write-Output "FOUT: Docker CLI niet gevonden."
-        exit 1
-    }
-
-    Write-Output "dotnet en docker gevonden."
+    Write-Output "dotnet gevonden."
 
     Write-Section "Omgeving laden"
 
@@ -72,46 +74,50 @@ try {
 
     Import-DotEnv -Path ".env"
 
-    $postgresUser = $env:POSTGRES_USER
-    $postgresPassword = $env:POSTGRES_PASSWORD
-
-    if ([string]::IsNullOrWhiteSpace($postgresUser) -or [string]::IsNullOrWhiteSpace($postgresPassword)) {
-        Write-Output "FOUT: POSTGRES_USER en POSTGRES_PASSWORD moeten in .env staan."
-        exit 1
-    }
-
     Write-Output "Omgevingsvariabelen geladen."
 
-    if (-not $SkipPostgres) {
-        Write-Section "PostgreSQL starten"
-        docker compose up -d postgres
+    Stop-CloudShirtDotNetProcesses
+
+    $localDataDir = Join-Path $repoRoot "src\local-data"
+    New-Item -ItemType Directory -Force -Path $localDataDir | Out-Null
+
+    $catalogDb = Join-Path $localDataDir "cloudshirt-catalog.db"
+    $identityDb = Join-Path $localDataDir "cloudshirt-identity.db"
+
+    $env:DatabaseProvider = 'sqlite'
+    $env:UseOnlyInMemoryDatabase = 'false'
+    $env:ConnectionStrings__CatalogConnection = "Data Source=$catalogDb"
+    $env:ConnectionStrings__IdentityConnection = "Data Source=$identityDb"
+
+    Write-Section "Web bouwen"
+    dotnet build .\src\Web\Web.csproj --configuration Debug
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
     }
 
-    Write-Section "PublicApi en Web starten"
+    Write-Section "Web starten"
 
-    $apiCommand = @"
-`$env:DatabaseProvider = 'postgres'
-`$env:UseOnlyInMemoryDatabase = 'false'
-`$env:ConnectionStrings__CatalogConnection = 'Host=localhost;Port=5432;Database=eshop_catalog;Username=$postgresUser;Password=$postgresPassword;'
-`$env:ConnectionStrings__IdentityConnection = 'Host=localhost;Port=5432;Database=eshop_identity;Username=$postgresUser;Password=$postgresPassword;'
-dotnet run --project .\src\PublicApi\PublicApi.csproj --launch-profile PublicApi
-"@
+    $logsDir = Join-Path $repoRoot "logs"
+    New-Item -ItemType Directory -Force -Path $logsDir | Out-Null
 
-    $webCommand = @"
-`$env:DatabaseProvider = 'postgres'
-`$env:UseOnlyInMemoryDatabase = 'false'
-`$env:ConnectionStrings__CatalogConnection = 'Host=localhost;Port=5432;Database=eshop_catalog;Username=$postgresUser;Password=$postgresPassword;'
-`$env:ConnectionStrings__IdentityConnection = 'Host=localhost;Port=5432;Database=eshop_identity;Username=$postgresUser;Password=$postgresPassword;'
-dotnet run --project .\src\Web\Web.csproj --launch-profile Web
-"@
+    $webOut = Join-Path $logsDir "web.out.log"
+    $webErr = Join-Path $logsDir "web.err.log"
 
-    Start-Process pwsh -ArgumentList "-NoExit", "-Command", $apiCommand
-    Start-Process pwsh -ArgumentList "-NoExit", "-Command", $webCommand
+    $webProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\Web\Web.csproj', '--launch-profile', 'Web') -WorkingDirectory $repoRoot -RedirectStandardOutput $webOut -RedirectStandardError $webErr -WindowStyle Hidden -PassThru
+
+    Set-Content -Path (Join-Path $logsDir 'web.pid') -Value $webProcess.Id
 
     Write-Section "Klaar"
-    Write-Output "Lokale .NET-modus gestart."
+    Write-Output "Lokale monolithische .NET-modus gestart."
     Write-Output "- Web: https://localhost:5001"
-    Write-Output "- PublicApi Swagger: https://localhost:5099/swagger"
+    Write-Output "- SQLite DB's: $catalogDb en $identityDb"
+    Write-Output ""
+    Write-Output "Proces-ID's:"
+    Write-Output "- Web: $($webProcess.Id)"
+    Write-Output ""
+    Write-Output "Logs:"
+    Write-Output "- $webOut"
+    Write-Output "- $webErr"
 }
 finally {
     Pop-Location

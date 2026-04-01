@@ -14,6 +14,8 @@ public static class Dependencies
             && useInMemory;
 
         var databaseProvider = configuration["DatabaseProvider"]?.Trim().ToLowerInvariant() ?? "postgres";
+        var catalogConnectionString = configuration.GetConnectionString("CatalogConnection");
+        var identityConnectionString = configuration.GetConnectionString("IdentityConnection");
 
         if (useOnlyInMemoryDatabase)
         {
@@ -23,15 +25,17 @@ public static class Dependencies
             services.AddDbContext<AppIdentityDbContext>(options =>
                 options.UseInMemoryDatabase("Identity"));
         }
+        else if (databaseProvider == "sqlite")
+        {
+            services.AddDbContext<CatalogContext>(c =>
+                c.UseSqlite(catalogConnectionString));
+
+            services.AddDbContext<AppIdentityDbContext>(options =>
+                options.UseSqlite(identityConnectionString));
+        }
         else
         {
-            var catalogConnectionString = configuration.GetConnectionString("CatalogConnection");
-            var identityConnectionString = configuration.GetConnectionString("IdentityConnection");
-
-            // PostgreSQL is the default relational runtime for Docker/Swarm/AWS readiness.
-            // Keep the provider key to support future extension without changing config shape.
-            _ = databaseProvider;
-
+            // PostgreSQL blijft de container-variant voor Docker en cloud-demonstraties.
             services.AddDbContext<CatalogContext>(c =>
                 c.UseNpgsql(catalogConnectionString));
 
