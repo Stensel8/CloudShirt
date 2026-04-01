@@ -18,6 +18,11 @@ public class CatalogItemViewModelService : ICatalogItemViewModelService
     public async Task UpdateCatalogItem(CatalogItemViewModel viewModel)
     {
         var existingCatalogItem = await _catalogItemRepository.GetByIdAsync(viewModel.Id);
+        if (existingCatalogItem == null)
+        {
+            return;
+        }
+
         existingCatalogItem.UpdateDetails(viewModel.Name, existingCatalogItem.Description, viewModel.Price);
         await _catalogItemRepository.UpdateAsync(existingCatalogItem);
     }

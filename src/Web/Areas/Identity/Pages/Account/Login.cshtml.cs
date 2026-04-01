@@ -24,24 +24,24 @@ public class LoginModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } = new();
 
-    public IList<AuthenticationScheme> ExternalLogins { get; set; }
+    public IList<AuthenticationScheme> ExternalLogins { get; set; } = null!;
 
-    public string ReturnUrl { get; set; }
+    public string ReturnUrl { get; set; } = string.Empty;
 
     [TempData]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 
     public class InputModel
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }

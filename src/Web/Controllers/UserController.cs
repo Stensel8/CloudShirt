@@ -23,12 +23,24 @@ public class UserController : ControllerBase
     [HttpGet]
     [Authorize]
     [AllowAnonymous]
-    public async Task<IActionResult> GetCurrentUser() =>
-        Ok(User.Identity.IsAuthenticated ? await CreateUserInfo(User) : UserInfo.Anonymous);
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var identity = User.Identity;
+        if (identity?.IsAuthenticated != true)
+        {
+            return Ok(UserInfo.Anonymous);
+        }
+
+        return Ok(await CreateUserInfo(User));
+    }
 
     private async Task<UserInfo> CreateUserInfo(ClaimsPrincipal claimsPrincipal)
     {
-        if (!claimsPrincipal.Identity.IsAuthenticated)
+        ArgumentNullException.ThrowIfNull(claimsPrincipal);
+
+        var principal = claimsPrincipal;
+        var identity = principal.Identity;
+        if (identity?.IsAuthenticated != true)
         {
             return UserInfo.Anonymous;
         }
@@ -38,7 +50,7 @@ public class UserController : ControllerBase
             IsAuthenticated = true
         };
 
-        if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        if (identity is ClaimsIdentity claimsIdentity)
         {
             userInfo.NameClaimType = claimsIdentity.NameClaimType;
             userInfo.RoleClaimType = claimsIdentity.RoleClaimType;
@@ -49,16 +61,17 @@ public class UserController : ControllerBase
             userInfo.RoleClaimType = "role";
         }
 
-        if (claimsPrincipal.Claims.Any())
+        var allClaims = principal.Claims.ToList();
+        if (allClaims.Count > 0)
         {
             var claims = new List<ClaimValue>();
-            var nameClaims = claimsPrincipal.FindAll(userInfo.NameClaimType);
+            var nameClaims = principal.FindAll(userInfo.NameClaimType).ToList();
             foreach (var claim in nameClaims)
             {
                 claims.Add(new ClaimValue(userInfo.NameClaimType, claim.Value));
             }
 
-            foreach (var claim in claimsPrincipal.Claims.Except(nameClaims))
+            foreach (var claim in allClaims.Except(nameClaims))
             {
                 claims.Add(new ClaimValue(claim.Type, claim.Value));
             }
@@ -66,7 +79,7 @@ public class UserController : ControllerBase
             userInfo.Claims = claims;
         }
 
-        var token = await _tokenClaimsService.GetTokenAsync(claimsPrincipal.Identity.Name);
+        var token = await _tokenClaimsService.GetTokenAsync(identity.Name ?? string.Empty);
         userInfo.Token = token;
 
         return userInfo;

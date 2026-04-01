@@ -73,6 +73,6 @@ public class CreateCatalogItemEndpoint : IEndpoint<IResult, CreateCatalogItemReq
             Price = newItem.Price
         };
         response.CatalogItem = dto;
-        return Results.Created($"api/catalog-items/{dto.Id}", response);       
+        return Results.Created($"api/catalog-items/{dto.Id}", response);
     }
 }

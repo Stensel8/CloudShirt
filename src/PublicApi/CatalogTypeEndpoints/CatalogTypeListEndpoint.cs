@@ -19,13 +19,13 @@ public class CatalogTypeListEndpoint : IEndpoint<IResult>
     private readonly IMapper _mapper;
 
     public CatalogTypeListEndpoint(IMapper mapper)
-    {      
+    {
         _mapper = mapper;
     }
 
     public void AddRoute(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/catalog-types", 
+        app.MapGet("api/catalog-types",
             async (IRepository<CatalogType> catalogTypeRepository) =>
             {
                 _catalogTypeRepository = catalogTypeRepository;

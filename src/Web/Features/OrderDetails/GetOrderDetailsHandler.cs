@@ -26,7 +26,7 @@ public class GetOrderDetailsHandler : IRequestHandler<GetOrderDetails, OrderView
 
         if (order == null)
         {
-            return null;
+            return default!;
         }
 
         return new OrderViewModel

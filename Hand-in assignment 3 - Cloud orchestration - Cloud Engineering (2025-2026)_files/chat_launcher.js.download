@@ -1,0 +1,260 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+    <link rel="shortcut icon" href="/F9CD80F3-B79B-49AB-AD16-6F61BFFFC81B/netdefender/alert/images/bdicon.ico" type="image/x-icon" />
+    <title>Web Protection by Bitdefender</title>
+    <link rel="stylesheet" href="/F9CD80F3-B79B-49AB-AD16-6F61BFFFC81B/netdefender/alert/css/tl_style.css" type="text/css" media="all" charset="utf-8" />
+</head>
+
+<body>
+
+    <div class="threat-blocked-view">
+
+        <div class="threat-blocked-container">
+            <div class="threat-blocked">
+                <div class="header">
+                    <div class="logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+                            <path fill="#d0021b" d="M31.69,32.44H26V42.2h5.46c3,0,7.28-.52,7.28-5C38.74,33.68,36.48,32.44,31.69,32.44Z" />
+                            <path fill="#d0021b" d="M53.91,0H6.09A6.09,6.09,0,0,0,0,6.08V53.92A6.09,6.09,0,0,0,6.09,60H53.91A6.09,6.09,0,0,0,60,53.92V6.08A6.09,6.09,0,0,0,53.91,0ZM32.09,47.46l-10.86,0V18.79c0-1.55-1.45-1.75-3.51-3.46L16,13.87v-.54H33.08c5,0,10.19,2.36,10.19,8.58,0,3.86-2.3,6.4-5.75,7.46v.1a8.07,8.07,0,0,1,7.22,8.25C44.74,45.16,38.41,47.46,32.09,47.46Z" />
+                            <path fill="#d0021b" d="M36.22,25.76a3.79,3.79,0,0,0,1.15-2.82A3.9,3.9,0,0,0,36.26,20c-1-1-2-1.43-5.35-1.43H26v8.59h5.42C33.89,27.18,35.24,26.71,36.22,25.76Z" />
+                        </svg>
+                    </div>
+
+                    <h1>
+                        <span>Web Protection by </span>Bitdefender
+                    </h1>
+
+                </div>
+
+                <div id="xiwC_d788365c0897601967ffddc3412786a4_id_alert_content">
+                    <div class="body">
+                        <h2>Suspicious page blocked for your protection</h2>
+                        <span class="muted" id="xiwC_d788365c0897601967ffddc3412786a4_id_url"></span>
+                        <!--  red/untrusted_root/mitm --><p>Your connection to this web page is not safe due to an untrusted security certificate.<br>Phishing sites often use fake certificates that trigger this alert, and their goal is to obtain your sensitive information.</p>
+                    </div>
+
+                    <div class="footer">
+                        <button class="primary-btn" id="xiwC_d788365c0897601967ffddc3412786a4_id_goToHomePage">Take me back to safety</button>
+                        
+                        
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+
+    </div>
+
+
+<script id="xiwC_d788365c0897601967ffddc3412786a4_script" type="text/javascript">
+    var xiwC_d788365c0897601967ffddc3412786a4_TIMEOUT = 1000;
+    var xiwC_d788365c0897601967ffddc3412786a4_timeoutID = -1;
+    var xiwC_d788365c0897601967ffddc3412786a4_action;
+    var xiwC_d788365c0897601967ffddc3412786a4_haspassword=false;
+
+	(function (undefined) {
+	
+		function encodeString(str) {
+			var temp = [];
+			var length = str.length;
+			for (var i = 0; i < length; i++) {
+				//obtain character code
+				var code = str.charCodeAt(i);
+				if (code >= 0xD800 && code <=0xDBFF) {
+					var high = code;
+					var low = str.charCodeAt(i+1);
+					if (isNaN(low)) {
+						//We hit the end of the string. Just skip this last character
+						continue;
+					}
+					code = (high - 0xD800) * 0x400 + (low - 0xDC00) + 0x10000;
+				}
+			
+				temp.push(["&#", code, ";"].join(''));
+			}
+			return temp.join('');
+		}
+	
+		function xiwC_d788365c0897601967ffddc3412786a4_goToHomePage() {
+			if (typeof window.home == 'function') {
+				window.home();
+			} else { // For IE
+				window.location = 'about:blank';
+			}
+		}
+
+		function xiwC_d788365c0897601967ffddc3412786a4_showpassword(show) {
+		    if (show) {
+		        document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_alert_content").style.display = "none";
+		        document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password_error").style.display = "none";
+		        document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password_content").style.display = "block";
+		        document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password").value = "";
+		        xiwC_d788365c0897601967ffddc3412786a4_haspassword=true;
+		    } else {
+		        document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_alert_content").style.display = "block";
+		        var elem = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password_content");
+		        if (elem) {
+		            elem.style.display = "none";
+		        }
+		        xiwC_d788365c0897601967ffddc3412786a4_haspassword=false;
+		    }
+		}
+
+		function xiwC_d788365c0897601967ffddc3412786a4_proceed() {
+		    var obj_ajax = null;
+		    (window.ActiveXObject) ? obj_ajax = new ActiveXObject("Microsoft.XMLHTTP") : obj_ajax = new XMLHttpRequest();
+		    if (obj_ajax) {
+		        obj_ajax.onreadystatechange = function () {
+		            if ((obj_ajax.readyState == 4) && (obj_ajax.status == 200)) {
+		                if (xiwC_d788365c0897601967ffddc3412786a4_timeoutID != -1) {
+                            clearTimeout(xiwC_d788365c0897601967ffddc3412786a4_timeoutID);
+		                    xiwC_d788365c0897601967ffddc3412786a4_timeoutID = -1;
+		                }
+		                var response = obj_ajax.getResponseHeader("BDWL_D0D57627257747A3B2EE8E4C3B86CBA3");
+		                if (response == "1") { // create
+		                    xiwC_d788365c0897601967ffddc3412786a4_showpassword(false);
+		                    xiwC_d788365c0897601967ffddc3412786a4_timeoutID = setTimeout(xiwC_d788365c0897601967ffddc3412786a4_proceed, xiwC_d788365c0897601967ffddc3412786a4_TIMEOUT);
+		                } else if (response == "2") { // pending
+		                    xiwC_d788365c0897601967ffddc3412786a4_timeoutID = setTimeout(xiwC_d788365c0897601967ffddc3412786a4_proceed, xiwC_d788365c0897601967ffddc3412786a4_TIMEOUT);
+		                } else if (response == "3") { // yes
+		                    window.location.reload();
+		                } else if (response == "4") { // no
+		                    xiwC_d788365c0897601967ffddc3412786a4_showpassword(false);
+		                } else if (response == "5") { // has-password
+		                    xiwC_d788365c0897601967ffddc3412786a4_showpassword(true);
+		                } else if (response == "6") { // request-password
+		                    xiwC_d788365c0897601967ffddc3412786a4_showpassword(true);
+		                } else if (response == "7") { // password-error
+		                    var epe = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password_error");
+		                    if (epe) {
+		                        epe.style.display = "block"; }
+		                } else if (response == "8") { // password-expired
+		                    xiwC_d788365c0897601967ffddc3412786a4_showpassword(false);
+		                    var epa = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_proceedAnyway");
+		                    if (epa) {
+		                        epa.style.display = "none"; }
+		                    var ewl = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_whitelist");
+		                    if (ewl) {
+		                        ewl.style.display = "none"; }
+		                } else if (response == "9") { // obk
+		                    window.location.reload();
+		                } 
+		            }
+		        }
+
+		        var params = encodeURIComponent(window.location);
+		        sid = "" + Math.random();
+		        obj_ajax.open("POST", sid, true);
+		        obj_ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		        obj_ajax.setRequestHeader("BDNDSS_B67EA559F21B487F861FDA8A44F01C50", "NDSECK_e0ca0dee409ef257f9d36fcf068de6bd");
+		        obj_ajax.setRequestHeader("BDNDCA_BBACF84D61A04F9AA66019A14B035478", "NDCA_e0ca0dee409ef257f9d36fcf068de6bd");
+		        obj_ajax.setRequestHeader("BDNDTK_BTS86RE4PDHKKZYVUJE2UCM87SLSUGYF", "6a4d2cc2499c83b29b3045ea43528a3d06b6c4690f0c8fb4666b565e435999a0");
+		        obj_ajax.setRequestHeader("BDWL_D0D57627257747A3B2EE8E4C3B86CBA3", "d788365c0897601967ffddc3412786a4");
+		        obj_ajax.setRequestHeader("BDPID_A381AA0A15254C36A72B115329559BEB", "15408");
+		        obj_ajax.setRequestHeader("BDNDWB_5056E556833D49C1AF4085CB254FC242", xiwC_d788365c0897601967ffddc3412786a4_action);
+		        if (xiwC_d788365c0897601967ffddc3412786a4_haspassword) {
+                    obj_ajax.setRequestHeader("BDPWD_B030436C9F234E61BBECEDA8AC84FB1E", document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password").value);
+                }
+		        obj_ajax.send(params);
+		    }
+		}
+
+        function xiwC_d788365c0897601967ffddc3412786a4_password_btnOk() {
+            var p = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_password").value;
+            if (!p) {
+                return; }
+            xiwC_d788365c0897601967ffddc3412786a4_proceed();
+        }
+
+        function xiwC_d788365c0897601967ffddc3412786a4_password_btnCancel() {
+            xiwC_d788365c0897601967ffddc3412786a4_showpassword(false);
+        }
+
+		function setUrl() {
+		    var elem = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_id_url");
+		    if (elem) {
+		        elem.innerHTML = encodeString(window.location.href);
+		    }
+		}
+
+		function setupClickListener(id, callback) {
+			var elem = document.getElementById(id);
+			//Disable click functions
+			if (elem) {
+				elem.addEventListener("click", function(event) {
+					event.preventDefault();
+					event.stopPropagation();
+					if (event.isTrusted) {
+						callback(event);
+					}
+				});
+			}
+		}
+		
+		function setupSubmitListener(id, callback) {
+			var elem = document.getElementById(id);
+			if (elem) {
+				elem.addEventListener("submit", function(event) {
+					event.preventDefault();
+					event.stopPropagation();
+					if (event.isTrusted) {
+						callback(event);
+					}
+				});
+			}
+		}
+
+		setUrl();
+
+		setupClickListener("xiwC_d788365c0897601967ffddc3412786a4_id_goToHomePage", function(){
+			xiwC_d788365c0897601967ffddc3412786a4_goToHomePage();
+			return false;
+		});
+
+		setupClickListener("xiwC_d788365c0897601967ffddc3412786a4_id_proceedAnyway", function(){
+		    xiwC_d788365c0897601967ffddc3412786a4_action = "cl.proceedanyway"; 
+		    xiwC_d788365c0897601967ffddc3412786a4_proceed();
+			return false;
+		});
+
+		setupClickListener("xiwC_d788365c0897601967ffddc3412786a4_id_add2whitelist", function(){
+		    xiwC_d788365c0897601967ffddc3412786a4_action = "add2whitelist";
+		    xiwC_d788365c0897601967ffddc3412786a4_proceed();
+			return false;
+		});
+
+		setupClickListener("xiwC_d788365c0897601967ffddc3412786a4_id_password_goToHomePage", function(){
+		    xiwC_d788365c0897601967ffddc3412786a4_goToHomePage();
+		    return false;
+		});
+
+		setupClickListener("xiwC_d788365c0897601967ffddc3412786a4_id_password_btnOk", function(){
+		    xiwC_d788365c0897601967ffddc3412786a4_password_btnOk();
+		    return false;
+		});
+		
+		setupSubmitListener("xiwC_d788365c0897601967ffddc3412786a4_id_password_form", function(){
+		    xiwC_d788365c0897601967ffddc3412786a4_password_btnOk();
+		    return false;
+		});
+
+		setupClickListener("xiwC_d788365c0897601967ffddc3412786a4_id_password_btnCancel", function(){
+		    xiwC_d788365c0897601967ffddc3412786a4_password_btnCancel();
+		    return false;
+		});
+		
+		xiwC_d788365c0897601967ffddc3412786a4_action = "running";
+		xiwC_d788365c0897601967ffddc3412786a4_proceed();
+
+		var script_elem = document.getElementById("xiwC_d788365c0897601967ffddc3412786a4_script");
+		script_elem.parentNode.removeChild(script_elem);
+	})();
+
+</script>
+</body>
+</html>

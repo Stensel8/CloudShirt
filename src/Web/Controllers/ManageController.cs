@@ -40,7 +40,7 @@ public class ManageController : Controller
     }
 
     [TempData]
-    public string StatusMessage { get; set; }
+    public string StatusMessage { get; set; } = string.Empty;
 
     [HttpGet]
     public async Task<IActionResult> MyAccount()
@@ -54,8 +54,8 @@ public class ManageController : Controller
         var model = new IndexViewModel
         {
             Username = user.UserName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
+            Email = user.Email ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
             IsEmailConfirmed = user.EmailConfirmed,
             StatusMessage = StatusMessage
         };
@@ -106,23 +106,13 @@ public class ManageController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SendVerificationEmail(IndexViewModel model)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
         }
 
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-        var email = user.Email;
-        await _emailSender.SendEmailConfirmationAsync(email, callbackUrl);
-
-        StatusMessage = "Verification email sent. Please check your email.";
+        StatusMessage = "This is a demo application and email verification has not been implemented.";
         return RedirectToAction(nameof(MyAccount));
     }
 
@@ -377,8 +367,8 @@ public class ManageController : Controller
     [HttpGet]
     public IActionResult ShowRecoveryCodes()
     {
-        var recoveryCodes = (string[])TempData[RecoveryCodesKey];
-        if (recoveryCodes == null)
+        var recoveryCodes = TempData[RecoveryCodesKey] as string[] ?? Array.Empty<string>();
+        if (recoveryCodes.Length == 0)
         {
             return RedirectToAction(nameof(TwoFactorAuthentication));
         }
@@ -419,7 +409,7 @@ public class ManageController : Controller
 
         await _userManager.SetTwoFactorEnabledAsync(user, true);
         _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
-        var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+        var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10) ?? Enumerable.Empty<string>();
         TempData[RecoveryCodesKey] = recoveryCodes.ToArray();
 
         return RedirectToAction(nameof(ShowRecoveryCodes));
@@ -463,7 +453,7 @@ public class ManageController : Controller
             throw new ApplicationException($"Cannot generate recovery codes for user with ID '{user.Id}' as they do not have 2FA enabled.");
         }
 
-        var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+        var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10) ?? Enumerable.Empty<string>();
         _logger.LogInformation("User with ID {UserId} has generated new 2FA recovery codes.", user.Id);
 
         var model = new ShowRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
@@ -531,8 +521,10 @@ public class ManageController : Controller
             unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
         }
 
+        ArgumentException.ThrowIfNullOrEmpty(unformattedKey);
+
         model.SharedKey = FormatKey(unformattedKey);
-        model.AuthenticatorUri = GenerateQrCodeUri(user.Email, unformattedKey);
+        model.AuthenticatorUri = GenerateQrCodeUri(user.Email ?? string.Empty, unformattedKey);
     }
 
 }

@@ -22,7 +22,12 @@ public class RevokeAuthenticationEvents : CookieAuthenticationEvents
 
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
     {
-        var userId = context.Principal.Claims.First(c => c.Type == ClaimTypes.Name);
+        var userId = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+        if (userId == null)
+        {
+            return;
+        }
+
         var identityKey = context.Request.Cookies[ConfigureCookieSettings.IdentifierCookieName];
 
         if (_cache.TryGetValue($"{userId.Value}:{identityKey}", out var revokeKeys))

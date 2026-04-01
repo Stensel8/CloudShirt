@@ -19,6 +19,11 @@ public class HomePageHealthCheck : IHealthCheck
         HealthCheckContext context,
         CancellationToken cancellationToken = default(CancellationToken))
     {
+        if (_httpContextAccessor.HttpContext == null)
+        {
+            return HealthCheckResult.Unhealthy("HttpContext is unavailable.");
+        }
+
         var request = _httpContextAccessor.HttpContext.Request;
         string myUrl = request.Scheme + "://" + request.Host.ToString();
 

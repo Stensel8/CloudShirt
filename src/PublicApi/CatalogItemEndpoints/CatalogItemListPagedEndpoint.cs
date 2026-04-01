@@ -34,7 +34,7 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
             {
                 _itemRepository = itemRepository;
                 return await HandleAsync(new ListPagedCatalogItemRequest(pageSize, pageIndex, catalogBrandId, catalogTypeId));
-            })            
+            })
             .Produces<ListPagedCatalogItemResponse>()
             .WithTags("CatalogItemEndpoints");
     }
