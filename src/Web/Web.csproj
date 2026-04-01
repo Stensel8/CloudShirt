@@ -43,18 +43,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="compilerconfig.json" />
-    <None Include="wwwroot\images\products\1.png" />
-    <None Include="wwwroot\images\products\10.png" />
-    <None Include="wwwroot\images\products\11.png" />
-    <None Include="wwwroot\images\products\12.png" />
-    <None Include="wwwroot\images\products\2.png" />
-    <None Include="wwwroot\images\products\3.png" />
-    <None Include="wwwroot\images\products\4.png" />
-    <None Include="wwwroot\images\products\5.png" />
-    <None Include="wwwroot\images\products\6.png" />
-    <None Include="wwwroot\images\products\7.png" />
-    <None Include="wwwroot\images\products\8.png" />
-    <None Include="wwwroot\images\products\9.png" />
+    <None Include="wwwroot\images\products\1.avif" />
+    <None Include="wwwroot\images\products\10.avif" />
+    <None Include="wwwroot\images\products\11.avif" />
+    <None Include="wwwroot\images\products\12.avif" />
+    <None Include="wwwroot\images\products\2.avif" />
+    <None Include="wwwroot\images\products\3.avif" />
+    <None Include="wwwroot\images\products\4.avif" />
+    <None Include="wwwroot\images\products\5.avif" />
+    <None Include="wwwroot\images\products\6.avif" />
+    <None Include="wwwroot\images\products\7.avif" />
+    <None Include="wwwroot\images\products\8.avif" />
+    <None Include="wwwroot\images\products\9.avif" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.json">

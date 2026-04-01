@@ -53,9 +53,9 @@ Tests:
 dotnet test .\eShopOnWeb.sln
 ```
 
-## 2) Docker app (microservices)
+## 2) Docker app (containers)
 
-Microservices-variant. Draait met Docker Compose en PostgreSQL.
+Containervariant. Draait met Docker Compose en PostgreSQL.
 
 ### Starten
 
@@ -65,8 +65,8 @@ Microservices-variant. Draait met Docker Compose en PostgreSQL.
 
 ## Wanneer gebruik je welke variant?
 
-- Lokale .NET variant: monolithisch, snel testen, data in SQLite.
-- Docker variant: microservices, dichter bij deployment, data in PostgreSQL.
+- Lokale .NET variant: snel opstarten en debuggen, geen Docker nodig, data in SQLite.
+- Docker variant: test de containersetup zoals die ook in de cloud draait, data in PostgreSQL.
 
 ## Data en state
 
@@ -74,6 +74,8 @@ Microservices-variant. Draait met Docker Compose en PostgreSQL.
 - Bij wisselen van modus start je dus met de state van de bijbehorende database.
 
 ## Demo
+
+![Demo screenshot](demo.avif)
 
 <video src="Short-Demo.webm" controls playsinline width="100%"></video>
 
