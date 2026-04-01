@@ -7,7 +7,7 @@ on:
   push:
     branches: ["main", "NET-10"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "NET-10"]
   workflow_dispatch:
 
 permissions:
@@ -35,10 +35,16 @@ jobs:
         run: dotnet restore ./eShopOnWeb.sln
 
       - name: Build solution
-        run: dotnet build ./eShopOnWeb.sln --configuration Release --no-restore 2>&1 | tee build.log
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet build ./eShopOnWeb.sln --configuration Release --no-restore 2>&1 | tee build.log
 
       - name: Test solution
-        run: dotnet test ./eShopOnWeb.sln --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" 2>&1 | tee test.log
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet test ./eShopOnWeb.sln --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" 2>&1 | tee test.log
 
       # Waarschuwingentellingen beschikbaar maken voor de PR-samenvatting.
       # Waarschuwingen zijn hier informatief, zodat beleid stapsgewijs strenger kan.
@@ -129,7 +135,7 @@ jobs:
   # Plaatst per PR één updatebare botcomment met een snelle CI-samenvatting voor de auteur.
   pr-feedback:
     name: PR Feedback Bot
-    if: github.event_name == 'pull_request'
+    if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs:
       - dotnet10-build-test
