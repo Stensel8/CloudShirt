@@ -78,4 +78,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Set PATH for dotnet tools
-ENV PATH "$PATH:/home/$USERNAME/.dotnet/tools"
+ENV PATH="$PATH:/home/$USERNAME/.dotnet/tools"
