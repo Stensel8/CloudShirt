@@ -1,15 +1,14 @@
-version: '3.4'
-
+# DOCKER_REGISTRY should include a trailing slash when set, e.g., 'myregistry.com/'
 services:
   eshopwebmvc:
-    image: ${DOCKER_REGISTRY}/eshopwebmvc:latest
+    image: ${DOCKER_REGISTRY-}eshopwebmvc:latest
     build:
       context: .
       dockerfile: src/Web/Dockerfile
     depends_on:
       - "sqlserver"
   eshoppublicapi:
-    image: ${DOCKER_REGISTRY}/eshoppublicapi:latest
+    image: ${DOCKER_REGISTRY-}eshoppublicapi:latest
     build:
       context: .
       dockerfile: src/PublicApi/Dockerfile
