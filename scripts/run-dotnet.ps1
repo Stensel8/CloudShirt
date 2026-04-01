@@ -46,6 +46,10 @@ function Stop-CloudShirtDotNetProcesses {
         )
     }
 
+    if ($processes.Count -gt 0) {
+        Write-Output "Deze applicatie draait al. Wordt nu geherstart...."
+    }
+
     foreach ($process in $processes) {
         Write-Output "Oude CloudShirt-processen stoppen: PID $($process.ProcessId)"
         Stop-Process -Id $process.ProcessId -Force

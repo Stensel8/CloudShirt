@@ -11,7 +11,7 @@ public class CatalogBrandConfiguration : IEntityTypeConfiguration<CatalogBrand>
         builder.HasKey(ci => ci.Id);
 
         builder.Property(ci => ci.Id)
-           .UseHiLo("catalog_brand_hilo")
+              .ValueGeneratedOnAdd()
            .IsRequired();
 
         builder.Property(cb => cb.Brand)

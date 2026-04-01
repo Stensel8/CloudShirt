@@ -28,6 +28,13 @@ function Write-Section {
     Write-Output "===== $Title ====="
 }
 
+function Test-CloudShirtDockerRunning {
+    $runningServices = docker compose ps --status running --services 2>$null |
+        Where-Object { $_ -and $_.Trim().Length -gt 0 }
+
+    return $runningServices.Count -gt 0
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 
@@ -46,6 +53,10 @@ try {
     if (-not (Test-Path ".env")) {
         Copy-Item ".env.example" ".env"
         Write-Output "Created .env from .env.example"
+    }
+
+    if (Test-CloudShirtDockerRunning) {
+        Write-Output "Deze applicatie draait al. Wordt nu geherstart...."
     }
 
     Write-Section "Docker-services starten"

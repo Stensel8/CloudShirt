@@ -11,7 +11,7 @@ public class CatalogItemConfiguration : IEntityTypeConfiguration<CatalogItem>
         builder.ToTable("Catalog");
 
         builder.Property(ci => ci.Id)
-            .UseHiLo("catalog_hilo")
+            .ValueGeneratedOnAdd()
             .IsRequired();
 
         builder.Property(ci => ci.Name)
