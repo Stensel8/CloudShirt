@@ -3,7 +3,7 @@
   "defaultProvider": "unpkg",
   "libraries": [
     {
-      "library": "jquery@3.3.1",
+      "library": "jquery@3.7.1",
       "files": [
         "dist/jquery.js",
         "dist/jquery.min.js"
@@ -11,7 +11,7 @@
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "library": "bootstrap@3.3.7",
+      "library": "bootstrap@4.6.2",
       "files": [
         "dist/css/bootstrap.css",
         "dist/css/bootstrap.css.map",
@@ -27,7 +27,7 @@
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
-      "library": "jquery-validation@1.17.0",
+      "library": "jquery-validation@1.19.5",
       "destination": "wwwroot/lib/jquery-validation/",
       "files": [
         "dist/jquery.validate.min.js",
@@ -39,12 +39,12 @@
       "destination": "wwwroot/lib/toastr/"
     },
     {
-      "library": "@aspnet/signalr@1.0.3",
+      "library": "@microsoft/signalr@8.0.7",
       "files": [
         "dist/browser/signalr.js",
         "dist/browser/signalr.min.js"
       ],
-      "destination": "wwwroot/lib/@aspnet/signalr/"
+      "destination": "wwwroot/lib/@microsoft/signalr/"
     }
   ]
 }
