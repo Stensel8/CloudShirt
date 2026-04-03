@@ -1,6 +1,6 @@
 {
   "extends": ["config:recommended"],
-  "enabledManagers": ["azure-pipelines", "dockerfile", "docker-compose", "custom.regex"],
+  "enabledManagers": ["nuget", "azure-pipelines", "dockerfile", "docker-compose", "custom.regex"],
   "azure-pipelines": {
     "enabled": true
   },
