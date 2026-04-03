@@ -2,32 +2,52 @@
 
 .esh-app {
     &-footer {
-        $margin: 2.5rem;
         $padding: 2.5rem;
 
         background-color: $color-background-darker;
         border-top: $border-light solid $color-foreground-bright;
-        margin-top: $margin;
+        margin-top: auto;
         padding-bottom: $padding;
         padding-top: $padding;
         width: 100%;
-        bottom: 0;
-        $height: 50px;
+        $height: 58px;
 
         &-brand {
             height: $height;
             width: 230px;
         }
+
+        &-text {
+            a,
+            a:visited,
+            a:active {
+                color: $color-foreground-bright;
+            }
+
+            a:hover {
+                color: $color-secondary;
+            }
+        }
     }
 
     &-header {
-        margin: 15px;
+        margin: 8px 15px;
+
+        &-brand {
+            display: block;
+            height: 110px;
+            margin-left: -390px;
+            max-width: none;
+            transform: scale(5.0);
+            transform-origin: left center;
+            width: auto;
+        }
     }
 
     &-wrapper {
         display: flex;
         min-height: 100vh;
         flex-direction: column;
-        justify-content: space-between
+        justify-content: flex-start;
     }
 }

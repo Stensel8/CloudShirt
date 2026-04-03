@@ -2,14 +2,79 @@
 
 .esh-pager {
 
+    &-nav {
+        align-items: center;
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        width: 100%;
+
+        &-section {
+            align-items: center;
+            display: flex;
+
+            &-center {
+                flex: 1;
+                justify-content: center;
+                text-align: center;
+            }
+
+            &-left,
+            &-right {
+                justify-content: center;
+                min-width: 130px;
+            }
+        }
+
+        @media screen and (max-width: $media-screen-m) {
+            flex-direction: column;
+            gap: .6rem;
+
+            &-section {
+                width: 100%;
+
+                &-left,
+                &-right,
+                &-center {
+                    justify-content: center;
+                    min-width: 0;
+                }
+            }
+        }
+    }
+
+    &-button {
+        align-items: center;
+        border: 1px solid $color-foreground-bright;
+        border-radius: 999px;
+        display: inline-flex;
+        font-weight: $font-weight-semilight;
+        gap: .35rem;
+        justify-content: center;
+        min-width: 112px;
+        padding: .4rem .9rem;
+        transition: all $animation-speed-default;
+        white-space: nowrap;
+
+        &-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        &:hover {
+            background-color: rgba($color-secondary, .1);
+            border-color: $color-secondary;
+            color: $color-secondary;
+        }
+    }
+
     &-wrapper {
         padding-top: 1rem;
         text-align: center;
     }
 
     &-item {
-        $margin: 5vw;
-        margin: 0 $margin;
+        margin: 0;
 
         &.is-disabled {
             opacity: .5;
@@ -28,9 +93,9 @@
         @media screen and (max-width: $media-screen-l) {
             font-size: $font-size-s;
         }
+    }
 
-        @media screen and (max-width: $media-screen-m) {
-            margin: 0 $margin / 2;
-        }
+    &-summary {
+        margin: 0 1rem;
     }
 }

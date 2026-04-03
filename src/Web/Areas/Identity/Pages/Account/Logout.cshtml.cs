@@ -28,8 +28,15 @@ public class LogoutModel : PageModel
         _cache = cache;
     }
 
-    public void OnGet()
+    public async Task<IActionResult> OnGet(string? returnUrl = null)
     {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            await _signInManager.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            _logger.LogInformation("User logged out via GET.");
+        }
+        return RedirectToPage("/Index");
     }
 
     public async Task<IActionResult> OnPost(string? returnUrl)

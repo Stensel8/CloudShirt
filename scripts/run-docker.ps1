@@ -106,8 +106,8 @@ try {
         Write-Output "Docker-modus gestart, maar niet alle endpoints zijn al bereikbaar."
         Write-Output "Tip: bekijk logs met: docker compose logs --tail=100"
     }
-    Write-Output "- Web: http://localhost:5106"
-    Write-Output "- PublicApi Swagger: http://localhost:5200/swagger"
+    Write-Output "- Web:              http://localhost:5106"
+    Write-Output "- PublicApi Swagger: http://localhost:5200/swagger  (geen root-pagina, alleen /swagger en /api/...)"
 }
 finally {
     Pop-Location

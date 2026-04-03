@@ -27,10 +27,18 @@
   display: inline-block;
 }
 
+.esh-identity-arrow {
+  display: inline-block;
+  height: 7px;
+  margin-left: .35rem;
+  vertical-align: middle;
+  width: 10px;
+}
+
 .esh-identity-drop {
   background: #FFFFFF;
   height: 10px;
-  width: 10rem;
+  width: 200px;
   overflow: hidden;
   padding: .5rem;
   position: absolute;
@@ -41,18 +49,26 @@
 
 .esh-identity:hover .esh-identity-drop {
   border: 1px solid #EEEEEE;
-  height: 14rem;
+  height: auto;
+  max-height: 15rem;
+  overflow-y: auto;
   transition: height 0.35s;
   z-index: 10;
 }
 
-.esh-identity-item {
+.esh-identity-drop .esh-identity-item {
   cursor: pointer;
   transition: color 0.35s;
+  display: block;
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+  text-align: left;
+  color: #000000;
 }
 
-.esh-identity-item:hover {
+.esh-identity-drop .esh-identity-item:hover {
   color: #75b918;
+  background-color: #f5f5f5;
   transition: color 0.35s;
 }
 

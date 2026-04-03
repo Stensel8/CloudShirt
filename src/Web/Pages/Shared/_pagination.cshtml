@@ -12,28 +12,30 @@
 <div class="esh-pager">
     <div class="container-fluid">
         <article class="esh-pager-wrapper row">
-            <nav>
-                <div class="col-md-2 col-xs-12">
-                    <a class="esh-pager-item-left esh-pager-item--navigable esh-pager-item @Model.Previous"
+            <nav class="esh-pager-nav" aria-label="Pagination">
+                <div class="esh-pager-nav-section esh-pager-nav-section-left">
+                    <a class="esh-pager-item-left esh-pager-item--navigable esh-pager-item esh-pager-button @Model.Previous"
                        id="Previous"
                        asp-all-route-data="prevRouteData"
                        aria-label="Previous">
-                        Previous
+                        <span class="esh-pager-button-icon" aria-hidden="true">&lsaquo;</span>
+                        <span>Previous</span>
                     </a>
                 </div>
 
-                <div class="col-md-8 col-xs-12">
-                    <span class="esh-pager-item">
+                <div class="esh-pager-nav-section esh-pager-nav-section-center">
+                    <span class="esh-pager-item esh-pager-summary">
                         Showing @Model.ItemsPerPage of @Model.TotalItems products - Page @(Model.ActualPage + 1) - @Model.TotalPages
                     </span>
                 </div>
 
-                <div class="col-md-2 col-xs-12">
-                    <a class="esh-pager-item-right esh-pager-item--navigable esh-pager-item @Model.Next"
+                <div class="esh-pager-nav-section esh-pager-nav-section-right">
+                    <a class="esh-pager-item-right esh-pager-item--navigable esh-pager-item esh-pager-button @Model.Next"
                        id="Next"
                        asp-all-route-data="nextRouteData"
                        aria-label="Next">
-                        Next
+                        <span>Next</span>
+                        <span class="esh-pager-button-icon" aria-hidden="true">&rsaquo;</span>
                     </a>
                 </div>
             </nav>

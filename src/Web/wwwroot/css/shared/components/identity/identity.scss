@@ -26,10 +26,18 @@
         display: inline-block;
     }
 
+    &-arrow {
+        display: inline-block;
+        height: 7px;
+        margin-left: .35rem;
+        vertical-align: middle;
+        width: 10px;
+    }
+
     &-drop {
         background: $color-background-brighter;
         height: 10px;
-        width: 10rem;
+        width: 200px;
         overflow: hidden;
         padding: .5rem;
         position: absolute;
@@ -40,16 +48,24 @@
 
     &:hover &-drop {
         border: $border-light solid $color-foreground-bright;
-        height: 10rem;
+        height: auto;
+        max-height: 15rem;
+        overflow-y: auto;
         transition: height $animation-speed-default;
     }
 
-    &-item {
+    &-drop &-item {
         cursor: pointer;
         transition: color $animation-speed-default;
+        display: block;
+        padding: 0.75rem 1rem;
+        line-height: 1.5;
+        text-align: left;
+        color: #000;
 
         &:hover {
             color: $color-secondary-dark;
+            background-color: #f5f5f5;
             transition: color $animation-speed-default;
         }
     }

@@ -9,6 +9,7 @@
     pointer-events: none; }
   .esh-basketstatus-image {
     height: 36px;
+    width: 36px;
     margin-top: .5rem; }
   .esh-basketstatus-badge {
     background-color: #83D01B;

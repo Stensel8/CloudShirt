@@ -2,7 +2,7 @@
 
 Korte implementatierepository voor schoolopdrachten binnen de Cloud Engineering-specialisatie.
 
-Deze applicatie is gebaseerd op een Saxion-docentenvariant van eShopOnWeb en door mij omgebouwd voor opdrachten in Cloud Automation Concepts.
+Deze applicatie is gebaseerd op een Saxion-docentenvariant en door mij omgebouwd voor opdrachten in Cloud Automation Concepts onder de naam CloudShirt.
 
 Gekoppelde module-repository:
 - https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts
@@ -50,7 +50,7 @@ Monolithische variant. Draait lokaal in één app met SQLite.
 Tests:
 
 ```powershell
-dotnet test .\eShopOnWeb.sln
+dotnet test .\*.sln
 ```
 
 ## 2) Docker app (containers)
@@ -83,5 +83,4 @@ Containervariant. Draait met Docker Compose en PostgreSQL.
 
 ## Credits
 
-- Originele upstream: https://github.com/dotnet-architecture/eShopOnWeb
-- Fork-basis voor deze variant: https://github.com/looking4ward/CloudShirt
+- Repository: https://github.com/Stensel8/CloudShirt

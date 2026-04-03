@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Microsoft.eShopOnWeb</title>
+    <title>@ViewData["Title"] - CloudShirt</title>
     <environment names="Development,Docker">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/app.css" />
@@ -27,10 +27,10 @@
     <div class="esh-app-wrapper">
         <header class="esh-app-header">
             <div class="container">
-                <article class="row">
+                <article class="row align-items-center">
                     <section class="col-lg-7 col-md-6 col-xs-12">
                         <a asp-area="" asp-page="/Index">
-                            <img src="~/images/brand.avif" alt="eShop On Web" />
+                            <img class="esh-app-header-brand" src="~/images/Brand.svg" alt="CloudShirt" />
                         </a>
                     </section>
                     <partial name="_LoginPartial" />
@@ -43,7 +43,9 @@
                 <article class="row">
                     <section class="col-sm-6"></section>
                     <section class="col-sm-6">
-                        <div class="esh-app-footer-text hidden-xs"> e-ShopOnWeb. All rights reserved </div>
+                        <div class="esh-app-footer-text hidden-xs">
+                            <a href="https://github.com/Stensel8/CloudShirt" target="_blank" rel="noopener noreferrer">CloudShirt on GitHub</a>
+                        </div>
                     </section>
                 </article>
             </div>

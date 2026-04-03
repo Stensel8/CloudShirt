@@ -9,8 +9,7 @@
     Dit script:
     1. Controleert vereiste tools
     2. Laadt variabelen uit .env (of maakt .env vanuit .env.example)
-    3. Bouwt de Web-app
-    4. Start Web als achtergrondproces met logbestand
+    3. Bouwt en start de Web-app
 
 .EXAMPLE
     .\scripts\run-dotnet.ps1
@@ -96,35 +95,45 @@ try {
     $env:ConnectionStrings__CatalogConnection = "Data Source=$catalogDb"
     $env:ConnectionStrings__IdentityConnection = "Data Source=$identityDb"
 
-    Write-Section "Web bouwen"
+    Write-Section "Web en PublicApi bouwen"
     dotnet build .\src\Web\Web.csproj --configuration Debug
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
-    }
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    Write-Section "Web starten"
+    dotnet build .\src\PublicApi\PublicApi.csproj --configuration Debug
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    Write-Section "Web en PublicApi starten"
 
     $logsDir = Join-Path $repoRoot "logs"
     New-Item -ItemType Directory -Force -Path $logsDir | Out-Null
 
-    $webOut = Join-Path $logsDir "web.out.log"
-    $webErr = Join-Path $logsDir "web.err.log"
+    $webOut  = Join-Path $logsDir "web.out.log"
+    $webErr  = Join-Path $logsDir "web.err.log"
+    $apiOut  = Join-Path $logsDir "api.out.log"
+    $apiErr  = Join-Path $logsDir "api.err.log"
 
     $webProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\Web\Web.csproj', '--launch-profile', 'Web') -WorkingDirectory $repoRoot -RedirectStandardOutput $webOut -RedirectStandardError $webErr -WindowStyle Hidden -PassThru
 
+    $apiProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\PublicApi\PublicApi.csproj', '--launch-profile', 'PublicApi') -WorkingDirectory $repoRoot -RedirectStandardOutput $apiOut -RedirectStandardError $apiErr -WindowStyle Hidden -PassThru
+
     Set-Content -Path (Join-Path $logsDir 'web.pid') -Value $webProcess.Id
+    Set-Content -Path (Join-Path $logsDir 'api.pid') -Value $apiProcess.Id
 
     Write-Section "Klaar"
     Write-Output "Lokale monolithische .NET-modus gestart."
-    Write-Output "- Web: https://localhost:5001"
+    Write-Output "- Web:              https://localhost:5001"
+    Write-Output "- PublicApi Swagger: https://localhost:5099/swagger  (geen root-pagina, alleen /swagger en /api/...)"
     Write-Output "- SQLite DB's: $catalogDb en $identityDb"
     Write-Output ""
     Write-Output "Proces-ID's:"
-    Write-Output "- Web: $($webProcess.Id)"
+    Write-Output "- Web:       $($webProcess.Id)"
+    Write-Output "- PublicApi: $($apiProcess.Id)"
     Write-Output ""
     Write-Output "Logs:"
     Write-Output "- $webOut"
     Write-Output "- $webErr"
+    Write-Output "- $apiOut"
+    Write-Output "- $apiErr"
 }
 finally {
     Pop-Location

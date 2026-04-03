@@ -48,7 +48,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var model = new IndexViewModel
@@ -75,7 +75,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var email = user.Email;
@@ -109,7 +109,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         StatusMessage = "This is a demo application and email verification has not been implemented.";
@@ -122,7 +122,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var hasPassword = await _userManager.HasPasswordAsync(user);
@@ -147,7 +147,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
@@ -170,7 +170,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var hasPassword = await _userManager.HasPasswordAsync(user);
@@ -196,7 +196,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
@@ -218,7 +218,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var model = new ExternalLoginsViewModel { CurrentLogins = await _userManager.GetLoginsAsync(user) };
@@ -250,7 +250,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var info = await _signInManager.GetExternalLoginInfoAsync(user.Id);
@@ -279,7 +279,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var result = await _userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey);
@@ -299,7 +299,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var model = new TwoFactorAuthenticationViewModel
@@ -318,7 +318,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         if (!user.TwoFactorEnabled)
@@ -336,7 +336,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
@@ -355,7 +355,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         var model = new EnableAuthenticatorViewModel();
@@ -385,7 +385,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         if (!ModelState.IsValid)
@@ -428,7 +428,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         await _userManager.SetTwoFactorEnabledAsync(user, false);
@@ -445,7 +445,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         if (!user.TwoFactorEnabled)
@@ -467,7 +467,7 @@ public class ManageController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return await HandleStaleSession();
         }
 
         if (!user.TwoFactorEnabled)
@@ -476,6 +476,13 @@ public class ManageController : Controller
         }
 
         return View(nameof(GenerateRecoveryCodesWarning));
+    }
+
+    private async Task<IActionResult> HandleStaleSession()
+    {
+        await _signInManager.SignOutAsync();
+        TempData["WarningMessage"] = "Your session is no longer valid. Please log in again to continue.";
+        return RedirectToPage("/Account/Login", new { area = "Identity" });
     }
 
     private void AddErrors(IdentityResult result)

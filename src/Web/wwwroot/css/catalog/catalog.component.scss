@@ -61,28 +61,16 @@
         }
 
         &::after {
-            background-image: url($image-arrow_down);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 7px solid $color-secondary;
             content: '';
-            height: 7px; //png height
+            height: 0;
             position: absolute;
             right: $filter-padding * 3;
             top: $filter-padding * 5;
-            width: 10px; //png width
+            width: 0;
             z-index: 1;
-        }
-    }
-
-    &-send {
-        background-color: $color-secondary;
-        color: $color-foreground-brighter;
-        cursor: pointer;
-        font-size: $font-size-m;
-        margin-top: -$filter-padding * 3;
-        transition: all $animation-speed-default;
-
-        &:hover {
-            background-color: $color-secondary-darker;
-            transition: all $animation-speed-default;
         }
     }
 

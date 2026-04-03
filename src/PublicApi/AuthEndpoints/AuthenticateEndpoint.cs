@@ -28,6 +28,7 @@ public class AuthenticateEndpoint : EndpointBaseAsync
 
     [HttpPost("api/authenticate")]
     [IgnoreAntiforgeryToken]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [SwaggerOperation(
         Summary = "Authenticates a user",
         Description = "Authenticates a user",

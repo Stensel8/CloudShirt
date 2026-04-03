@@ -1,20 +1,33 @@
 ﻿.esh-app-footer {
   background-color: #000000;
   border-top: 1px solid #EEEEEE;
-  margin-top: 2.5rem;
+  margin-top: auto;
   padding-bottom: 2.5rem;
   padding-top: 2.5rem;
-  width: 100%;
-  bottom: 0; }
+  width: 100%; }
   .esh-app-footer-brand {
-    height: 50px;
+    height: 58px;
     width: 230px; }
+  .esh-app-footer-text a,
+  .esh-app-footer-text a:visited,
+  .esh-app-footer-text a:active {
+    color: #EEEEEE; }
+  .esh-app-footer-text a:hover {
+    color: #83D01B; }
 
 .esh-app-header {
-  margin: 15px; }
+  margin: 8px 15px; }
+  .esh-app-header-brand {
+    display: block;
+    height: 110px;
+    margin-left: -390px;
+    max-width: none;
+    transform: scale(5.0);
+    transform-origin: left center;
+    width: auto; }
 
 .esh-app-wrapper {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  justify-content: space-between; }
+  justify-content: flex-start; }
