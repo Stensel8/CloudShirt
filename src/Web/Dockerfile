@@ -4,6 +4,8 @@ WORKDIR /src
 # Stap 1 - Kopieer eerst alleen oplossing- en projectbestanden.
 # Waarom: Docker kan de 'restore'-laag dan hergebruiken, wat builds sneller maakt.
 COPY *.sln ./
+COPY Directory.Build.props ./
+COPY Directory.Packages.props ./
 COPY src/ApplicationCore/ApplicationCore.csproj src/ApplicationCore/
 COPY src/Infrastructure/Infrastructure.csproj src/Infrastructure/
 COPY src/BlazorShared/BlazorShared.csproj src/BlazorShared/

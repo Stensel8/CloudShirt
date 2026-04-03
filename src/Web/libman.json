@@ -4,43 +4,47 @@
   "libraries": [
     {
       "library": "jquery@3.3.1",
+      "files": [
+        "dist/jquery.js",
+        "dist/jquery.min.js"
+      ],
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "library": "twitter-bootstrap@3.3.7",
+      "library": "bootstrap@3.3.7",
       "files": [
-        "css/bootstrap.css",
-        "css/bootstrap.css.map",
-        "css/bootstrap.min.css",
-        "css/bootstrap.min.css.map",
-        "js/bootstrap.js",
-        "js/bootstrap.min.js"
+        "dist/css/bootstrap.css",
+        "dist/css/bootstrap.css.map",
+        "dist/css/bootstrap.min.css",
+        "dist/css/bootstrap.min.css.map",
+        "dist/js/bootstrap.js",
+        "dist/js/bootstrap.min.js"
       ],
-      "destination": "wwwroot/lib/bootstrap/dist/"
+      "destination": "wwwroot/lib/bootstrap/"
     },
     {
       "library": "jquery-validation-unobtrusive@3.2.10",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
-      "library": "jquery-validate@1.17.0",
-      "destination": "wwwroot/lib/jquery-validate/",
+      "library": "jquery-validation@1.17.0",
+      "destination": "wwwroot/lib/jquery-validation/",
       "files": [
-        "jquery.validate.min.js",
-        "jquery.validate.js"
+        "dist/jquery.validate.min.js",
+        "dist/jquery.validate.js"
       ]
     },
     {
-      "library": "toastr.js@2.1.4",
+      "library": "toastr@2.1.4",
       "destination": "wwwroot/lib/toastr/"
     },
     {
-      "library": "aspnet-signalr@1.0.3",
+      "library": "@aspnet/signalr@1.0.3",
       "files": [
-        "signalr.js",
-        "signalr.min.js"
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
       ],
-      "destination": "wwwroot/lib/@aspnet/signalr/dist/browser/"
+      "destination": "wwwroot/lib/@aspnet/signalr/"
     }
   ]
 }
