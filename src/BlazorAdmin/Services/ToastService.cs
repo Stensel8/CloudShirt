@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Timers;
+using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
+using Timer = System.Timers.Timer;
 
 namespace BlazorAdmin.Services;
 
