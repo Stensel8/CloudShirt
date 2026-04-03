@@ -41,7 +41,7 @@ public class CatalogItemListPagedEndpoint
         var stringResponse2 = await response2.Content.ReadAsStringAsync();
         var model2 = stringResponse2.FromJson<ListPagedCatalogItemResponse>();
 
-        var totalExpected = totalItem - (pageSize * pageIndex);
+        var totalExpected = Math.Min(pageSize, Math.Max(0, totalItem - (pageSize * pageIndex)));
 
         Assert.AreEqual(totalExpected, model2.CatalogItems.Count());
     }

@@ -83,4 +83,5 @@ Containervariant. Draait met Docker Compose en PostgreSQL.
 
 ## Credits
 
-- Repository: https://github.com/Stensel8/CloudShirt
+- Originele upstream: https://github.com/dotnet-architecture/eShopOnWeb
+- Fork-basis voor deze variant: https://github.com/looking4ward/CloudShirt
