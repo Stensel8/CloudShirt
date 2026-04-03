@@ -266,3 +266,5 @@ pub/
 .env.local
 /logs
 /.claude
+
+logs.txt

@@ -48,23 +48,7 @@ public class CatalogContextSeed
             }
             else
             {
-                var existingProductImageNumbers = await catalogContext.CatalogItems
-                    .Select(ci => ci.PictureUri)
-                    .Where(uri => !string.IsNullOrEmpty(uri))
-                    .Select(uri => GetProductImageNumber(uri!))
-                    .Where(number => number.HasValue)
-                    .Select(number => number!.Value)
-                    .ToListAsync();
-
-                var missingItems = GetPreconfiguredItems()
-                    .Where(item => !existingProductImageNumbers.Contains(GetProductImageNumber(item.PictureUri) ?? -1))
-                    .ToList();
-
-                if (missingItems.Count > 0)
-                {
-                    await catalogContext.CatalogItems.AddRangeAsync(missingItems);
-                    await catalogContext.SaveChangesAsync();
-                }
+                await SyncCatalogItemsAsync(catalogContext);
             }
         }
         catch (Exception ex)
@@ -149,20 +133,64 @@ public class CatalogContextSeed
             };
     }
 
+    static async Task SyncCatalogItemsAsync(CatalogContext catalogContext)
+    {
+        var seededItems = GetPreconfiguredItems().ToList();
+        var seededByImageNumber = seededItems
+            .Select(item => (Item: item, ImageNumber: GetProductImageNumber(item.PictureUri)))
+            .Where(x => x.ImageNumber.HasValue)
+            .GroupBy(x => x.ImageNumber!.Value)
+            .ToDictionary(group => group.Key, group => group.First().Item);
+
+        var existingItems = await catalogContext.CatalogItems.ToListAsync();
+        var existingByImageNumber = existingItems
+            .Select(item => (Item: item, ImageNumber: GetProductImageNumber(item.PictureUri)))
+            .Where(x => x.ImageNumber.HasValue)
+            .GroupBy(x => x.ImageNumber!.Value)
+            .ToDictionary(group => group.Key, group => group.First().Item);
+
+        foreach (var (imageNumber, seededItem) in seededByImageNumber)
+        {
+            if (existingByImageNumber.TryGetValue(imageNumber, out var existingItem))
+            {
+                existingItem.UpdateDetails(seededItem.Name, seededItem.Description, seededItem.Price);
+                existingItem.UpdateBrand(seededItem.CatalogBrandId);
+                existingItem.UpdateType(seededItem.CatalogTypeId);
+
+                if (!string.Equals(existingItem.PictureUri, seededItem.PictureUri, StringComparison.Ordinal))
+                {
+                    existingItem.UpdatePictureUri(GetPictureFileName(seededItem.PictureUri));
+                }
+            }
+            else
+            {
+                await catalogContext.CatalogItems.AddAsync(new CatalogItem(
+                    seededItem.CatalogTypeId,
+                    seededItem.CatalogBrandId,
+                    seededItem.Description,
+                    seededItem.Name,
+                    seededItem.Price,
+                    seededItem.PictureUri));
+            }
+        }
+
+        await catalogContext.SaveChangesAsync();
+    }
+
     static int? GetProductImageNumber(string uri)
     {
-        const string marker = "/images/products/";
-        var markerIndex = uri.LastIndexOf(marker, StringComparison.OrdinalIgnoreCase);
-        if (markerIndex < 0) return null;
-
-        var fileNameStart = markerIndex + marker.Length;
-        var fileName = uri[fileNameStart..];
-        var queryIndex = fileName.IndexOf('?');
-        if (queryIndex >= 0) fileName = fileName[..queryIndex];
-
+        var fileName = GetPictureFileName(uri);
         var extensionIndex = fileName.LastIndexOf('.');
-        if (extensionIndex > 0) fileName = fileName[..extensionIndex];
+        var fileStem = extensionIndex > 0 ? fileName[..extensionIndex] : fileName;
+        return int.TryParse(fileStem, out var imageNumber) ? imageNumber : null;
+    }
 
-        return int.TryParse(fileName, out var imageNumber) ? imageNumber : null;
+    static string GetPictureFileName(string uri)
+    {
+        var normalized = uri.Replace('\\', '/');
+        var lastSlash = normalized.LastIndexOf('/');
+        var fileName = lastSlash >= 0 ? normalized[(lastSlash + 1)..] : normalized;
+        var queryIndex = fileName.IndexOf('?');
+        return queryIndex >= 0 ? fileName[..queryIndex] : fileName;
     }
 }
