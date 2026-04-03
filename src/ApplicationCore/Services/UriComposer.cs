@@ -10,6 +10,15 @@ public class UriComposer : IUriComposer
 
     public string ComposePicUri(string uriTemplate)
     {
-        return uriTemplate.Replace("http://catalogbaseurltobereplaced", _catalogSettings.CatalogBaseUrl);
+        var composedUri = uriTemplate.Replace("http://catalogbaseurltobereplaced", _catalogSettings.CatalogBaseUrl);
+
+        // Backward compatibility for old seeded data that referenced png assets.
+        if (composedUri.Contains("/images/products/", StringComparison.OrdinalIgnoreCase) &&
+            composedUri.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+        {
+            composedUri = composedUri[..^4] + ".avif";
+        }
+
+        return composedUri;
     }
 }

@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
@@ -44,6 +45,26 @@ public class CatalogContextSeed
                     GetPreconfiguredItems());
 
                 await catalogContext.SaveChangesAsync();
+            }
+            else
+            {
+                var existingProductImageNumbers = await catalogContext.CatalogItems
+                    .Select(ci => ci.PictureUri)
+                    .Where(uri => !string.IsNullOrEmpty(uri))
+                    .Select(uri => GetProductImageNumber(uri!))
+                    .Where(number => number.HasValue)
+                    .Select(number => number!.Value)
+                    .ToListAsync();
+
+                var missingItems = GetPreconfiguredItems()
+                    .Where(item => !existingProductImageNumbers.Contains(GetProductImageNumber(item.PictureUri) ?? -1))
+                    .ToList();
+
+                if (missingItems.Count > 0)
+                {
+                    await catalogContext.CatalogItems.AddRangeAsync(missingItems);
+                    await catalogContext.SaveChangesAsync();
+                }
             }
         }
         catch (Exception ex)
@@ -126,5 +147,22 @@ public class CatalogContextSeed
                 new(1,3, "Visual Studio Logo Mug", "Visual Studio Logo Mug", 10.50M, "http://catalogbaseurltobereplaced/images/products/35.avif"),
                 new(2,5, "Design Is Thinking Made Visual T-Shirt", "Design Is Thinking Made Visual T-Shirt", 18.50M, "http://catalogbaseurltobereplaced/images/products/37.avif")
             };
+    }
+
+    static int? GetProductImageNumber(string uri)
+    {
+        const string marker = "/images/products/";
+        var markerIndex = uri.LastIndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (markerIndex < 0) return null;
+
+        var fileNameStart = markerIndex + marker.Length;
+        var fileName = uri[fileNameStart..];
+        var queryIndex = fileName.IndexOf('?');
+        if (queryIndex >= 0) fileName = fileName[..queryIndex];
+
+        var extensionIndex = fileName.LastIndexOf('.');
+        if (extensionIndex > 0) fileName = fileName[..extensionIndex];
+
+        return int.TryParse(fileName, out var imageNumber) ? imageNumber : null;
     }
 }
