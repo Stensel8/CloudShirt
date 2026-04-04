@@ -62,4 +62,9 @@ public class CatalogItem : BaseEntity, IAggregateRoot
         }
         PictureUri = $"images\\products\\{pictureName}?{new DateTime().Ticks}";
     }
+
+    public void SetPictureUri(string pictureUri)
+    {
+        PictureUri = pictureUri ?? string.Empty;
+    }
 }
