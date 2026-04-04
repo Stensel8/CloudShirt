@@ -114,7 +114,7 @@ function Stop-ProcessesUsingPorts {
     }
 }
 
-function Ensure-RequiredPortsAvailable {
+function Resolve-RequiredPorts {
     param([int[]]$Ports)
 
     Stop-DockerContainersUsingPorts -Ports $Ports
@@ -150,7 +150,7 @@ function Test-EndpointWithRetry {
         try {
             $response = Invoke-WebRequest -UseBasicParsing $Url -TimeoutSec 8
             $elapsed = [int]((Get-Date) - $startedAt).TotalSeconds
-            Write-Host "${Name}: $($response.StatusCode) (na ${elapsed}s)"
+            Write-Output "${Name}: $($response.StatusCode) (na ${elapsed}s)"
             return $true
         }
         catch {
@@ -159,7 +159,7 @@ function Test-EndpointWithRetry {
         }
     }
 
-    Write-Host "$Name check mislukt na ${MaxWaitSeconds}s: $lastError"
+    Write-Output "$Name check mislukt na ${MaxWaitSeconds}s: $lastError"
     return $false
 }
 
@@ -188,7 +188,7 @@ try {
     }
 
     Write-Section "Poorten vrijmaken"
-    Ensure-RequiredPortsAvailable -Ports @(5106, 5200, 5432)
+    Resolve-RequiredPorts -Ports @(5106, 5200, 5432)
 
     Write-Section "Docker-services starten"
     $webImageExists = Test-ImageExists -ImageName "cloudshirt-dotnet-web:latest"

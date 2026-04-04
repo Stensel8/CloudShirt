@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Stopt lokale CloudShirt-processen die via dotnet run zijn gestart
-    (Web en PublicApi projectprocessen) en ruimt het web.pid bestand op.
+    (Web en PublicApi projectprocessen) en ruimt de PID-bestanden op.
 
 .EXAMPLE
     .\scripts\stop-dotnet.ps1
@@ -53,9 +53,14 @@ try {
 
     Stop-CloudShirtDotNetProcesses
 
-    $pidFile = Join-Path $repoRoot "logs\web.pid"
-    if (Test-Path $pidFile) {
-        Remove-Item -Force $pidFile
+    $pidFiles = @(
+        Join-Path $repoRoot "logs\web.pid",
+        Join-Path $repoRoot "logs\api.pid"
+    )
+    foreach ($pidFile in $pidFiles) {
+        if (Test-Path $pidFile) {
+            Remove-Item -Force $pidFile
+        }
     }
 
     Write-Section "Klaar"
