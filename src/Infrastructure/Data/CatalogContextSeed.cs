@@ -159,7 +159,7 @@ public class CatalogContextSeed
 
                 if (!string.Equals(existingItem.PictureUri, seededItem.PictureUri, StringComparison.Ordinal))
                 {
-                    existingItem.UpdatePictureUri(GetPictureFileName(seededItem.PictureUri));
+                    catalogContext.Entry(existingItem).Property(nameof(CatalogItem.PictureUri)).CurrentValue = seededItem.PictureUri;
                 }
             }
             else
