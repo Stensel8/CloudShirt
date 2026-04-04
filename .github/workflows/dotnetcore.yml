@@ -1,4 +1,4 @@
-name: CloudShirt CI
+name: CloudShirt .NET CI
 
 # Deze workflow valideert pull requests en branch pushes op twee vlakken:
 # 1) Native .NET 10 restore/build/test
@@ -15,8 +15,8 @@ permissions:
 
 jobs:
   # Kwaliteitspoort voor de volledige solution op .NET 10.
-  dotnet10-build-test:
-    name: .NET 10 Build and Test
+  build:
+    name: .NET Build
     runs-on: ubuntu-latest
     outputs:
       build_warnings: ${{ steps.collect.outputs.build_warnings }}
@@ -68,10 +68,30 @@ jobs:
             test.log
             **/*.trx
 
-  # Container-kwaliteitspoort: controleer Dockerfiles/compose build en voer securityscans uit.
-  docker-build-security:
-    name: Docker Build and Security
+  # Security-kwaliteitspoort met Trivy scan over de repository-inhoud.
+  security:
+    name: Security Scan
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Scan repository filesystem (Trivy)
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+
+  # Container-kwaliteitspoort: controleer Dockerfiles en compose build.
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout
@@ -101,17 +121,6 @@ jobs:
       - name: Build compose stack
         run: docker compose -f docker-compose.yml build
 
-      # Officieel action-tagformaat zodat Dependabot automatisch bump-PR's kan maken.
-      - name: Scan repository filesystem (Trivy)
-        uses: aquasecurity/trivy-action@v0.35.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          format: table
-          exit-code: "1"
-
       - name: Scan Web image (Trivy)
         uses: aquasecurity/trivy-action@v0.35.0
         with:
@@ -134,12 +143,13 @@ jobs:
 
   # Plaatst per PR één updatebare botcomment met een snelle CI-samenvatting voor de auteur.
   pr-feedback:
-    name: PR Feedback Bot
+    name: PR Feedback
     if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs:
-      - dotnet10-build-test
-      - docker-build-security
+      - build
+      - security
+      - docker
     permissions:
       contents: read
       pull-requests: write
@@ -149,23 +159,26 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            // Vaste marker zodat reruns dezelfde comment bijwerken in plaats van extra ruis te maken.
             const marker = '<!-- cloudshirt-ci-feedback -->';
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
+            const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const author = context.payload.pull_request.user.login;
 
-            const dotnetResult = '${{ needs.dotnet10-build-test.result }}';
-            const dockerResult = '${{ needs.docker-build-security.result }}';
-            const buildWarnings = '${{ needs.dotnet10-build-test.outputs.build_warnings || '0' }}';
-            const testWarnings = '${{ needs.dotnet10-build-test.outputs.test_warnings || '0' }}';
+            const buildResult = '${{ needs.build.result }}';
+            const securityResult = '${{ needs.security.result }}';
+            const dockerResult = '${{ needs.docker.result }}';
+            const buildWarnings = '${{ needs.build.outputs.build_warnings || '0' }}';
+            const testWarnings = '${{ needs.build.outputs.test_warnings || '0' }}';
+            const ok = r => r === 'success' ? '✅' : r === 'skipped' ? '⏭️' : '❌';
 
-            let intro = `Hey @${author}, let even op. Je hebt een paar kleine zaken waar je nog even op moet letten.`;
+            const allGreen =
+              buildResult === 'success' &&
+              securityResult === 'success' &&
+              dockerResult === 'success';
 
-            if (dotnetResult === 'success' && dockerResult === 'success' && buildWarnings === '0' && testWarnings === '0') {
-              intro = `Hey @${author}, netjes. .NET 10 en Docker checks zijn groen zonder gevonden warnings.`;
-            }
+            const intro = allGreen
+              ? `Hey @${author}, alle checks zijn groen ✅`
+              : `Hey @${author}, er zijn problemen gevonden. Controleer de job logs.`;
 
             const body = [
               marker,
@@ -173,15 +186,15 @@ jobs:
               '',
               intro,
               '',
-              `- .NET 10 build/test: ${dotnetResult}`,
-              `- Docker build/security: ${dockerResult}`,
-              `- Build warnings: ${buildWarnings}`,
-              `- Test warnings: ${testWarnings}`,
-              '',
-              'Als een check failed is, open de job logs in GitHub Actions en pak de melding daar direct op.'
+              '| Job | Status |',
+              '|---|---|',
+              `| .NET build/test | ${ok(buildResult)} |`,
+              `| Security scan (Trivy) | ${ok(securityResult)} |`,
+              `| Docker build | ${ok(dockerResult)} |`,
+              `| Build warnings | ${buildWarnings} |`,
+              `| Test warnings | ${testWarnings} |`
             ].join('\n');
 
-            // Lees bestaande comments en werk waar mogelijk dezelfde comment bij.
             const comments = await github.rest.issues.listComments({
               owner,
               repo,
