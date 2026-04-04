@@ -60,7 +60,6 @@ public class CatalogContextSeed
 
             logger.LogError(ex, "Error while seeding catalog context");
             await SeedAsync(catalogContext, logger, retryForAvailability);
-            return;
         }
     }
 
