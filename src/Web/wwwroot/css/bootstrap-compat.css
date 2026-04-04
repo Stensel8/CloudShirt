@@ -1,0 +1,91 @@
+.container,
+.container-fluid {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    width: 100%;
+}
+
+@media (min-width: 576px) {
+    .container { max-width: 540px; }
+}
+
+@media (min-width: 768px) {
+    .container { max-width: 720px; }
+}
+
+@media (min-width: 992px) {
+    .container { max-width: 960px; }
+}
+
+@media (min-width: 1200px) {
+    .container { max-width: 1140px; }
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -.75rem;
+    margin-right: -.75rem;
+}
+
+.row > * {
+    padding-left: .75rem;
+    padding-right: .75rem;
+}
+
+.col-xs-1,.col-sm-1,.col-md-1,.col-lg-1 { flex: 0 0 auto; width: 8.333333%; }
+.col-xs-2,.col-sm-2,.col-md-2,.col-lg-2 { flex: 0 0 auto; width: 16.666667%; }
+.col-xs-3,.col-sm-3,.col-md-3,.col-lg-3 { flex: 0 0 auto; width: 25%; }
+.col-xs-4,.col-sm-4,.col-md-4,.col-lg-4 { flex: 0 0 auto; width: 33.333333%; }
+.col-xs-5,.col-sm-5,.col-md-5,.col-lg-5 { flex: 0 0 auto; width: 41.666667%; }
+.col-xs-6,.col-sm-6,.col-md-6,.col-lg-6 { flex: 0 0 auto; width: 50%; }
+.col-xs-7,.col-sm-7,.col-md-7,.col-lg-7 { flex: 0 0 auto; width: 58.333333%; }
+.col-xs-8,.col-sm-8,.col-md-8,.col-lg-8 { flex: 0 0 auto; width: 66.666667%; }
+.col-xs-9,.col-sm-9,.col-md-9,.col-lg-9 { flex: 0 0 auto; width: 75%; }
+.col-xs-10,.col-sm-10,.col-md-10,.col-lg-10 { flex: 0 0 auto; width: 83.333333%; }
+.col-xs-11,.col-sm-11,.col-md-11,.col-lg-11 { flex: 0 0 auto; width: 91.666667%; }
+.col-xs-12,.col-sm-12,.col-md-12,.col-lg-12 { flex: 0 0 auto; width: 100%; }
+
+@media (max-width: 767.98px) {
+    .hidden-xs { display: none !important; }
+}
+
+@media (max-width: 1199.98px) {
+    .hidden-lg-down { display: none !important; }
+}
+
+.align-items-center { align-items: center !important; }
+.text-right { text-align: right !important; }
+.text-white { color: #fff !important; }
+
+.btn {
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.25;
+    padding: .5rem 1rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.btn-default {
+    background-color: #fff;
+    border-color: #ccc;
+    color: #333;
+}
+
+.btn-link {
+    background: transparent;
+    border: 0;
+    color: #007bff;
+    padding: 0;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}

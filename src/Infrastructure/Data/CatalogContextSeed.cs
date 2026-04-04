@@ -53,13 +53,15 @@ public class CatalogContextSeed
         }
         catch (Exception ex)
         {
-            if (retryForAvailability >= 10) throw;
+            if (retryForAvailability >= 10)
+            {
+                throw;
+            }
 
             retryForAvailability++;
 
             logger.LogError(ex, "Error while seeding catalog context");
             await SeedAsync(catalogContext, logger, retryForAvailability);
-            throw;
         }
     }
 
