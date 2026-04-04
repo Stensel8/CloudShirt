@@ -46,10 +46,8 @@ public class CatalogContextSeed
 
                 await catalogContext.SaveChangesAsync();
             }
-            else
-            {
-                await SyncCatalogItemsAsync(catalogContext);
-            }
+
+            await SyncCatalogItemsAsync(catalogContext);
         }
         catch (Exception ex)
         {
