@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
@@ -22,27 +23,47 @@ public class CatalogContextSeed
                 await catalogContext.Database.EnsureCreatedAsync();
             }
 
-            if (!await catalogContext.CatalogBrands.AnyAsync())
-            {
-                await catalogContext.CatalogBrands.AddRangeAsync(
-                    GetPreconfiguredCatalogBrands());
+            var existingBrandNames = await catalogContext.CatalogBrands
+                .Select(b => b.Brand)
+                .ToListAsync();
 
+            var missingBrands = GetPreconfiguredCatalogBrands()
+                .Where(seedBrand => !existingBrandNames.Contains(seedBrand.Brand, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (missingBrands.Count > 0)
+            {
+                await catalogContext.CatalogBrands.AddRangeAsync(missingBrands);
                 await catalogContext.SaveChangesAsync();
             }
 
-            if (!await catalogContext.CatalogTypes.AnyAsync())
-            {
-                await catalogContext.CatalogTypes.AddRangeAsync(
-                    GetPreconfiguredCatalogTypes());
+            var existingTypeNames = await catalogContext.CatalogTypes
+                .Select(t => t.Type)
+                .ToListAsync();
 
+            var missingTypes = GetPreconfiguredCatalogTypes()
+                .Where(seedType => !existingTypeNames.Contains(seedType.Type, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (missingTypes.Count > 0)
+            {
+                await catalogContext.CatalogTypes.AddRangeAsync(missingTypes);
                 await catalogContext.SaveChangesAsync();
             }
 
-            if (!await catalogContext.CatalogItems.AnyAsync())
-            {
-                await catalogContext.CatalogItems.AddRangeAsync(
-                    GetPreconfiguredItems());
+            // Keep seed idempotent across persistent Docker volumes:
+            // add only items that are missing by name.
+            var existingItemNames = await catalogContext.CatalogItems
+                .Select(i => i.Name)
+                .ToListAsync();
 
+            var missingItems = GetPreconfiguredItems()
+                .Where(seedItem => !existingItemNames.Contains(seedItem.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (missingItems.Count > 0)
+            {
+                await catalogContext.CatalogItems.AddRangeAsync(missingItems);
                 await catalogContext.SaveChangesAsync();
             }
         }

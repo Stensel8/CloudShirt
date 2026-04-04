@@ -4,9 +4,9 @@
 services:
 
   # Stap 1 - Webapp (frontend)
-  eshopwebmvc:
-    container_name: cloudshirt-web-frontend
-    image: ${DOCKER_REGISTRY-}eshopwebmvc:latest
+  web:
+    container_name: cloudshirt-dotnet-web
+    image: ${DOCKER_REGISTRY-}cloudshirt-dotnet-web:latest
     build:
       context: .
       dockerfile: src/Web/Dockerfile
@@ -15,8 +15,8 @@ services:
       ASPNETCORE_URLS: http://+:80
       DatabaseProvider: postgres
       UseOnlyInMemoryDatabase: "false"
-      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__CatalogConnection: Host=db;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=db;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     ports:
       # Hostpoort 5106 -> containerpoort 80
       - "5106:80"
@@ -25,7 +25,7 @@ services:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost/ > /dev/null || exit 1"]
@@ -35,9 +35,9 @@ services:
       start_period: 20s
 
   # Stap 2 - Public API (backend)
-  eshoppublicapi:
-    container_name: cloudshirt-api-backend
-    image: ${DOCKER_REGISTRY-}eshoppublicapi:latest
+  api:
+    container_name: cloudshirt-dotnet-api
+    image: ${DOCKER_REGISTRY-}cloudshirt-dotnet-api:latest
     build:
       context: .
       dockerfile: src/PublicApi/Dockerfile
@@ -46,8 +46,8 @@ services:
       ASPNETCORE_URLS: http://+:80
       DatabaseProvider: postgres
       UseOnlyInMemoryDatabase: "false"
-      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__CatalogConnection: Host=db;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=db;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     ports:
       # Hostpoort 5200 -> containerpoort 80
       - "5200:80"
@@ -56,7 +56,7 @@ services:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost/swagger > /dev/null || exit 1"]
@@ -66,9 +66,9 @@ services:
       start_period: 20s
 
   # Stap 3 - Database
-  postgres:
-    container_name: cloudshirt-db-postgres
-    image: postgres:16-alpine
+  db:
+    container_name: cloudshirt-dotnet-db
+    image: postgres:18-alpine
     ports:
       # Hostpoort 5432 -> containerpoort 5432
       - "5432:5432"

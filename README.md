@@ -1,87 +1,50 @@
-# CloudShirt
+# CloudShirt (.NET)
 
-Korte implementatierepository voor schoolopdrachten binnen de Cloud Engineering-specialisatie.
+Demo-project voor school met dezelfde app in twee .NET-architecturen:
 
-Deze applicatie is gebaseerd op een Saxion-docentenvariant en door mij omgebouwd voor opdrachten in Cloud Automation Concepts onder de naam CloudShirt.
+- Monoliet (lokaal, zonder app-containers)
+- Microservices (Docker Compose)
 
-Gekoppelde module-repository:
-- https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts
+Beide gebruiken PostgreSQL.
 
-Gebruik in opdrachten:
-- Assignment 1: AWS Basics
-- Assignment 2: Docker in the Cloud
-- Assignment 3: Cloud Orchestration
+## Starten
 
-## Starten en stoppen
-
-Gebruik de scripts in de map scripts:
+Monoliet:
 
 ```powershell
 .\scripts\run-dotnet.ps1
 ```
 
+Microservices (Docker):
+
 ```powershell
 .\scripts\run-docker.ps1
+```
+
+Swarm:
+
+```powershell
+.\scripts\run-swarm.ps1
 ```
 
 Stoppen:
 
 ```powershell
 .\scripts\stop-dotnet.ps1
-```
-
-```powershell
 .\scripts\stop-docker.ps1
+.\scripts\stop-swarm.ps1
 ```
 
-Deze scripts gebruiken de waarden uit .env (of maken die aan vanuit .env.example).
-Als een variant al draait, geven de run-scripts een herstartmelding en starten opnieuw op.
+## Demo-poorten
 
-## 1) Lokale .NET app (.NET 10)
+- Web: http://localhost:5106
+- Public API: http://localhost:5200
+- Swagger: http://localhost:5200/swagger
+- PostgreSQL: localhost:5432
 
-Monolithische variant. Draait lokaal in één app met SQLite.
+## Doel
 
-### Starten
+Dit project laat zien dat dezelfde business-app werkt als:
 
-```powershell
-.\scripts\run-dotnet.ps1
-```
-
-Tests:
-
-```powershell
-dotnet test .\*.sln
-```
-
-## 2) Docker app (containers)
-
-Containervariant. Draait met Docker Compose en PostgreSQL.
-
-### Starten
-
-```powershell
-.\scripts\run-docker.ps1
-```
-
-## Wanneer gebruik je welke variant?
-
-- Lokale .NET variant: snel opstarten en debuggen, geen Docker nodig, data in SQLite.
-- Docker variant: test de containersetup zoals die ook in de cloud draait, data in PostgreSQL.
-
-## Data en state
-
-- SQLite (lokale .NET) en PostgreSQL (Docker) delen niet automatisch dezelfde data/state.
-- Bij wisselen van modus start je dus met de state van de bijbehorende database.
-
-## Demo
-
-![Demo screenshot](demo.avif)
-
-<video src="Short-Demo.webm" controls playsinline width="100%"></video>
-
-[Bekijk demo (WebM)](Short-Demo.webm)
-
-## Credits
-
-- Originele upstream: https://github.com/dotnet-architecture/eShopOnWeb
-- Fork-basis voor deze variant: https://github.com/looking4ward/CloudShirt
+- .NET monoliet
+- .NET microservices

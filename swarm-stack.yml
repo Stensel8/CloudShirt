@@ -1,51 +1,65 @@
 version: "3.8"
 
 services:
-
-  eshopwebmvc:
-    image: ${DOCKER_REGISTRY}/eshopwebmvc:latest
-    depends_on:
-      - postgres
+  web:
+    image: cloudshirt-dotnet-web:latest
     environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
       DatabaseProvider: postgres
       UseOnlyInMemoryDatabase: "false"
-      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == worker
+      ConnectionStrings__CatalogConnection: Host=db;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=db;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     ports:
       - target: 80
-        published: 5601
+        published: 5106
         protocol: tcp
         mode: host
-
-  eshoppublicapi:
-    image: ${DOCKER_REGISTRY}/eshoppublicapi:latest
-    depends_on:
-      - postgres
-    environment:
-      DatabaseProvider: postgres
-      UseOnlyInMemoryDatabase: "false"
-      ConnectionStrings__CatalogConnection: Host=postgres;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-      ConnectionStrings__IdentityConnection: Host=postgres;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == worker
+      restart_policy:
+        condition: on-failure
 
-  postgres:
-    image: postgres:16-alpine
+  api:
+    image: cloudshirt-dotnet-api:latest
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DatabaseProvider: postgres
+      UseOnlyInMemoryDatabase: "false"
+      ConnectionStrings__CatalogConnection: Host=db;Port=5432;Database=eshop_catalog;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      ConnectionStrings__IdentityConnection: Host=db;Port=5432;Database=eshop_identity;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+    ports:
+      - target: 80
+        published: 5200
+        protocol: tcp
+        mode: host
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: postgres:18-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - target: 5432
+        published: 5432
+        protocol: tcp
+        mode: host
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - type: bind
+        source: ./docker/postgres/init
+        target: /docker-entrypoint-initdb.d
+        read_only: true
     deploy:
-      placement:
-        constraints:
-          - node.role == worker
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  postgres-data:

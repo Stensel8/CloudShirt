@@ -20,14 +20,14 @@ function Write-Section {
 }
 
 function Stop-CloudShirtDotNetProcesses {
-    $processes = Get-CimInstance Win32_Process | Where-Object {
+    $processes = @(Get-CimInstance Win32_Process | Where-Object {
         $_.Name -eq 'dotnet.exe' -and (
             $_.CommandLine -like '*src\PublicApi\PublicApi.csproj*' -or
             $_.CommandLine -like '*src/PublicApi/PublicApi.csproj*' -or
             $_.CommandLine -like '*src\Web\Web.csproj*' -or
             $_.CommandLine -like '*src/Web/Web.csproj*'
         )
-    }
+    })
 
     if ($processes.Count -eq 0) {
         Write-Output "Geen draaiende CloudShirt .NET-processen gevonden."
@@ -36,7 +36,12 @@ function Stop-CloudShirtDotNetProcesses {
 
     foreach ($process in $processes) {
         Write-Output "CloudShirt-process stoppen: PID $($process.ProcessId)"
-        Stop-Process -Id $process.ProcessId -Force
+        try {
+            Stop-Process -Id $process.ProcessId -Force -ErrorAction Stop
+        }
+        catch {
+            Write-Output "PID $($process.ProcessId) was al gestopt."
+        }
     }
 }
 

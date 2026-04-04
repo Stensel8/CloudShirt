@@ -9,7 +9,7 @@
     Dit script:
     1. Controleert vereiste tools
     2. Zorgt voor een .env-bestand
-    3. Start docker compose met rebuild en orphan cleanup
+    3. Start docker compose snel met cachegebruik; build alleen als images ontbreken
     4. Toont status en basis endpoint-checks
 
 .EXAMPLE
@@ -33,6 +33,106 @@ function Test-CloudShirtDockerRunning {
         Where-Object { $_ -and $_.Trim().Length -gt 0 })
 
     return $runningServices.Count -gt 0
+}
+
+function Stop-DockerContainersUsingPorts {
+    param([int[]]$Ports)
+
+    $containerLines = @(docker ps --format "{{.ID}}|{{.Names}}|{{.Ports}}" 2>$null)
+    $containerIdsToStop = [System.Collections.Generic.HashSet[string]]::new()
+
+    foreach ($line in $containerLines) {
+        if (-not $line) { continue }
+
+        $parts = $line -split "\|", 3
+        if ($parts.Count -lt 3) { continue }
+
+        $containerId = $parts[0]
+        $containerName = $parts[1]
+        $portsText = $parts[2]
+        $isCloudShirtContainer = $containerName -like "cloudshirt-*"
+
+        foreach ($port in $Ports) {
+            if ($portsText -like "*:$port->*") {
+                if (-not $isCloudShirtContainer) {
+                    Write-Output "FOUT: poort $port wordt gebruikt door niet-CloudShirt container '$containerName'."
+                    Write-Output "Stop deze container handmatig en probeer opnieuw."
+                    exit 1
+                }
+
+                if ($containerIdsToStop.Add($containerId)) {
+                    Write-Output "Poort $port in gebruik door container '$containerName'. Container wordt gestopt."
+                }
+                break
+            }
+        }
+    }
+
+    foreach ($containerId in $containerIdsToStop) {
+        docker stop $containerId *> $null
+        docker rm $containerId *> $null
+    }
+}
+
+function Stop-ProcessesUsingPorts {
+    param([int[]]$Ports)
+
+    $processIds = [System.Collections.Generic.HashSet[int]]::new()
+
+    foreach ($port in $Ports) {
+        $connections = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+        foreach ($connection in $connections) {
+            if ($connection.OwningProcess -gt 4) {
+                [void]$processIds.Add($connection.OwningProcess)
+            }
+        }
+    }
+
+    foreach ($procId in $processIds) {
+        try {
+            $process = Get-Process -Id $procId -ErrorAction Stop
+            $commandLine = (Get-CimInstance Win32_Process -Filter "ProcessId = $procId" -ErrorAction SilentlyContinue).CommandLine
+            $isCloudShirtProcess = $false
+
+            if ($process.ProcessName -eq "dotnet" -and $commandLine) {
+                $isCloudShirtProcess = $commandLine -like "*CloudShirt*"
+            }
+
+            if ($isCloudShirtProcess) {
+                Write-Output "Poortconflict opgelost: CloudShirt-proces '$($process.ProcessName)' (PID $procId) wordt gestopt."
+                Stop-Process -Id $procId -Force -ErrorAction Stop
+            }
+            else {
+                Write-Output "FOUT: poortconflict door niet-CloudShirt proces '$($process.ProcessName)' (PID $procId)."
+                Write-Output "Stop dit proces handmatig en probeer opnieuw."
+                exit 1
+            }
+        }
+        catch {
+            Write-Output "Waarschuwing: proces op PID $procId kon niet worden geverifieerd/gestopt."
+        }
+    }
+}
+
+function Ensure-RequiredPortsAvailable {
+    param([int[]]$Ports)
+
+    Stop-DockerContainersUsingPorts -Ports $Ports
+    Stop-ProcessesUsingPorts -Ports $Ports
+}
+
+function Test-ImageExists {
+    param([string]$ImageName)
+
+    docker image inspect $ImageName *> $null
+    return $LASTEXITCODE -eq 0
+}
+
+function Try-PullComposeServiceImage {
+    param([string]$ServiceName)
+
+    docker compose pull $ServiceName
+    return $LASTEXITCODE -eq 0
 }
 
 function Test-EndpointWithRetry {
@@ -84,11 +184,47 @@ try {
     }
 
     if (Test-CloudShirtDockerRunning) {
-        Write-Output "Deze applicatie draait al. Wordt nu geherstart...."
+        Write-Output "Er draait al een compose-stack in deze map."
     }
 
+    Write-Section "Poorten vrijmaken"
+    Ensure-RequiredPortsAvailable -Ports @(5106, 5200, 5432)
+
     Write-Section "Docker-services starten"
-    docker compose up -d --build --remove-orphans
+    $webImageExists = Test-ImageExists -ImageName "cloudshirt-dotnet-web:latest"
+    $apiImageExists = Test-ImageExists -ImageName "cloudshirt-dotnet-api:latest"
+
+    if (-not ($webImageExists -and $apiImageExists)) {
+        Write-Output "Lokale app-images ontbreken. Eerst prebuilt images proberen te pullen."
+        [void](Try-PullComposeServiceImage -ServiceName "web")
+        [void](Try-PullComposeServiceImage -ServiceName "api")
+
+        $webImageExists = Test-ImageExists -ImageName "cloudshirt-dotnet-web:latest"
+        $apiImageExists = Test-ImageExists -ImageName "cloudshirt-dotnet-api:latest"
+
+        if ($webImageExists -and $apiImageExists) {
+            Write-Output "Prebuilt images gevonden. Start zonder lokale build."
+            docker compose up -d --remove-orphans
+        }
+        else {
+            Write-Output "Geen bruikbare prebuilt images gevonden. Eenmalige build wordt uitgevoerd."
+            docker compose up -d --build --remove-orphans
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Output "FOUT: Docker build/start is mislukt. Stoppen zonder endpoint checks."
+            exit $LASTEXITCODE
+        }
+    }
+    else {
+        Write-Output "Snelle modus: bestaande images/caches worden hergebruikt."
+        docker compose up -d --remove-orphans
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Output "FOUT: Docker start is mislukt. Stoppen zonder endpoint checks."
+            exit $LASTEXITCODE
+        }
+    }
 
     Write-Section "Containerstatus"
     docker compose ps

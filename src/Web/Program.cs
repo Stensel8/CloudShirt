@@ -122,7 +122,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 var catalogBaseUrl = builder.Configuration.GetValue(typeof(string), "CatalogBaseUrl") as string;
-if (!string.IsNullOrEmpty(catalogBaseUrl))
+if (!string.IsNullOrEmpty(catalogBaseUrl) && catalogBaseUrl.StartsWith('/'))
 {
     app.Use((context, next) =>
     {
