@@ -60,6 +60,7 @@ public class CatalogContextSeed
 
             logger.LogError(ex, "Error while seeding catalog context");
             await SeedAsync(catalogContext, logger, retryForAvailability);
+            return;
         }
     }
 
@@ -139,19 +140,15 @@ public class CatalogContextSeed
         var seededByImageNumber = seededItems
             .Select(item => (Item: item, ImageNumber: GetProductImageNumber(item.PictureUri)))
             .Where(x => x.ImageNumber.HasValue)
-            .GroupBy(x => x.ImageNumber!.Value)
-            .ToDictionary(group => group.Key, group => group.First().Item);
+            .ToDictionary(x => x.ImageNumber!.Value, x => x.Item);
 
         var existingItems = await catalogContext.CatalogItems.ToListAsync();
-        var existingByImageNumber = existingItems
-            .Select(item => (Item: item, ImageNumber: GetProductImageNumber(item.PictureUri)))
-            .Where(x => x.ImageNumber.HasValue)
-            .GroupBy(x => x.ImageNumber!.Value)
-            .ToDictionary(group => group.Key, group => group.First().Item);
 
-        foreach (var (imageNumber, seededItem) in seededByImageNumber)
+        foreach (var existingItem in existingItems)
         {
-            if (existingByImageNumber.TryGetValue(imageNumber, out var existingItem))
+            var imageNumber = GetProductImageNumber(existingItem.PictureUri);
+            if (imageNumber.HasValue &&
+                seededByImageNumber.TryGetValue(imageNumber.Value, out var seededItem))
             {
                 existingItem.UpdateDetails(seededItem.Name, seededItem.Description, seededItem.Price);
                 existingItem.UpdateBrand(seededItem.CatalogBrandId);
@@ -161,17 +158,20 @@ public class CatalogContextSeed
                 {
                     existingItem.SetPictureUri(seededItem.PictureUri);
                 }
+
+                seededByImageNumber.Remove(imageNumber.Value);
             }
-            else
-            {
-                await catalogContext.CatalogItems.AddAsync(new CatalogItem(
-                    seededItem.CatalogTypeId,
-                    seededItem.CatalogBrandId,
-                    seededItem.Description,
-                    seededItem.Name,
-                    seededItem.Price,
-                    seededItem.PictureUri));
-            }
+        }
+
+        foreach (var seededItem in seededByImageNumber.Values)
+        {
+            await catalogContext.CatalogItems.AddAsync(new CatalogItem(
+                seededItem.CatalogTypeId,
+                seededItem.CatalogBrandId,
+                seededItem.Description,
+                seededItem.Name,
+                seededItem.Price,
+                seededItem.PictureUri));
         }
 
         await catalogContext.SaveChangesAsync();

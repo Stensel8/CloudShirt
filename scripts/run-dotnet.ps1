@@ -88,15 +88,12 @@ try {
     $identityDb = Join-Path $localDataDir "cloudshirt-identity.db"
 
     Write-Section "Database modus"
-    Write-Output "Volledig lokale monolithische modus (SQLite, zonder Docker containers)."
+    Write-Output "Volledig lokale monolithische modus (SQLite, zonder Docker)."
 
     $env:DatabaseProvider = 'sqlite'
     $env:UseOnlyInMemoryDatabase = 'false'
     $env:ConnectionStrings__CatalogConnection = "Data Source=$catalogDb"
     $env:ConnectionStrings__IdentityConnection = "Data Source=$identityDb"
-    $env:ASPNETCORE_ENVIRONMENT = 'Docker'
-    $env:DOTNET_ENVIRONMENT = 'Docker'
-    $env:CatalogBaseUrl = ''
 
     Write-Section "Web en PublicApi bouwen"
     dotnet build .\src\Web\Web.csproj --configuration Debug
@@ -115,17 +112,17 @@ try {
     $apiOut  = Join-Path $logsDir "api.out.log"
     $apiErr  = Join-Path $logsDir "api.err.log"
 
-    $webProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\Web\Web.csproj', '--no-launch-profile', '--urls', 'http://localhost:5106') -WorkingDirectory $repoRoot -RedirectStandardOutput $webOut -RedirectStandardError $webErr -WindowStyle Hidden -PassThru
+    $webProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\Web\Web.csproj', '--launch-profile', 'Web') -WorkingDirectory $repoRoot -RedirectStandardOutput $webOut -RedirectStandardError $webErr -WindowStyle Hidden -PassThru
 
-    $apiProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\PublicApi\PublicApi.csproj', '--no-launch-profile', '--urls', 'http://localhost:5200') -WorkingDirectory $repoRoot -RedirectStandardOutput $apiOut -RedirectStandardError $apiErr -WindowStyle Hidden -PassThru
+    $apiProcess = Start-Process -FilePath dotnet -ArgumentList @('run', '--no-build', '--no-restore', '--project', '.\src\PublicApi\PublicApi.csproj', '--launch-profile', 'PublicApi') -WorkingDirectory $repoRoot -RedirectStandardOutput $apiOut -RedirectStandardError $apiErr -WindowStyle Hidden -PassThru
 
     Set-Content -Path (Join-Path $logsDir 'web.pid') -Value $webProcess.Id
     Set-Content -Path (Join-Path $logsDir 'api.pid') -Value $apiProcess.Id
 
     Write-Section "Klaar"
     Write-Output "Lokale monolithische .NET-modus gestart."
-    Write-Output "- Web:              http://localhost:5106"
-    Write-Output "- PublicApi Swagger: http://localhost:5200/swagger  (geen root-pagina, alleen /swagger en /api/...)"
+    Write-Output "- Web:              https://localhost:5001"
+    Write-Output "- PublicApi Swagger: https://localhost:5099/swagger  (geen root-pagina, alleen /swagger en /api/...)"
     Write-Output "- SQLite DB's: $catalogDb en $identityDb"
     Write-Output ""
     Write-Output "Proces-ID's:"

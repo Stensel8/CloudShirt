@@ -35,12 +35,9 @@
 
         &-brand {
             display: block;
-            height: 110px;
-            margin-left: -390px;
-            max-width: none;
-            transform: scale(5.0);
-            transform-origin: left center;
-            width: auto;
+            height: auto;
+            max-width: 100%;
+            width: 420px;
         }
     }
 
