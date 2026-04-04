@@ -27,7 +27,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.None; // HTTP-only deployment (geen TLS)
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.LoginPath = "/Identity/Account/Login";
         options.LogoutPath = "/Identity/Account/Logout";
@@ -161,10 +161,9 @@ else
 {
     app.Logger.LogInformation("Adding non-Development middleware...");
     app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    // UseHsts en UseHttpsRedirection zijn uitgeschakeld: de app draait achter een
+    // HTTP-only ALB zonder TLS-certificaat (demo/schoolopdracht omgeving).
 }
-
-app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseRouting();
