@@ -6,6 +6,7 @@ using Microsoft.eShopWeb.ApplicationCore.Services;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
 using Moq;
 using Xunit;
+using TestAppLogger = Microsoft.eShopWeb.UnitTests.Builders.TestAppLogger<Microsoft.eShopWeb.ApplicationCore.Services.BasketService>;
 
 namespace Microsoft.eShopWeb.UnitTests.ApplicationCore.Services.BasketServiceTests;
 
@@ -20,17 +21,17 @@ public class TransferBasket
     [Fact]
     public async Task ThrowsGivenNullAnonymousId()
     {
-        var basketService = new BasketService(null, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
 
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await basketService.TransferBasketAsync(null, "steve"));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await basketService.TransferBasketAsync(null!, "steve"));
     }
 
     [Fact]
     public async Task ThrowsGivenNullUserId()
     {
-        var basketService = new BasketService(null, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
 
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await basketService.TransferBasketAsync("abcdefg", null));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await basketService.TransferBasketAsync("abcdefg", null!));
     }
 
     [Fact]
@@ -41,7 +42,7 @@ public class TransferBasket
         _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
         await basketService.TransferBasketAsync(_nonexistentAnonymousBasketBuyerId, _existentUserBasketBuyerId);
         _mockBasketRepo.Verify(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default), Times.Once);
     }
@@ -58,7 +59,7 @@ public class TransferBasket
         _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
         await basketService.TransferBasketAsync(_nonexistentAnonymousBasketBuyerId, _existentUserBasketBuyerId);
         _mockBasketRepo.Verify(x => x.UpdateAsync(userBasket, default), Times.Once);
         Assert.Equal(3, userBasket.Items.Count);
@@ -75,7 +76,7 @@ public class TransferBasket
         _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
         await basketService.TransferBasketAsync(_nonexistentAnonymousBasketBuyerId, _existentUserBasketBuyerId);
         _mockBasketRepo.Verify(x => x.UpdateAsync(userBasket, default), Times.Once);
         _mockBasketRepo.Verify(x => x.DeleteAsync(anonymousBasket, default), Times.Once);
@@ -89,7 +90,7 @@ public class TransferBasket
         _mockBasketRepo.SetupSequence(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default))
             .ReturnsAsync(anonymousBasket)
             .ReturnsAsync(userBasket);
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
         await basketService.TransferBasketAsync(_existentAnonymousBasketBuyerId, _nonexistentUserBasketBuyerId);
         _mockBasketRepo.Verify(x => x.AddAsync(It.Is<Basket>(x => x.BuyerId == _nonexistentUserBasketBuyerId), default), Times.Once);
     }

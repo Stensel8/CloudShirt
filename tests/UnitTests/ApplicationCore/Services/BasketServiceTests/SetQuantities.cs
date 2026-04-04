@@ -6,6 +6,7 @@ using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Services;
 using Moq;
 using Xunit;
+using TestAppLogger = Microsoft.eShopWeb.UnitTests.Builders.TestAppLogger<Microsoft.eShopWeb.ApplicationCore.Services.BasketService>;
 
 namespace Microsoft.eShopWeb.UnitTests.ApplicationCore.Services.BasketServiceTests;
 
@@ -17,7 +18,7 @@ public class SetQuantities
     [Fact]
     public async Task ThrowsGivenInvalidBasketId()
     {
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
 
         await Assert.ThrowsAsync<BasketNotFoundException>(async () =>
             await basketService.SetQuantities(_invalidId, new System.Collections.Generic.Dictionary<string, int>()));
@@ -26,9 +27,9 @@ public class SetQuantities
     [Fact]
     public async Task ThrowsGivenNullQuantities()
     {
-        var basketService = new BasketService(null, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
 
         await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            await basketService.SetQuantities(123, null));
+            await basketService.SetQuantities(123, null!));
     }
 }

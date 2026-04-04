@@ -15,7 +15,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogBrandEndpoints;
 /// </summary>
 public class CatalogBrandListEndpoint : IEndpoint<IResult>
 {
-    private IRepository<CatalogBrand> _catalogBrandRepository;
+    private IRepository<CatalogBrand>? _catalogBrandRepository;
     private readonly IMapper _mapper;
 
     public CatalogBrandListEndpoint(IMapper mapper)
@@ -38,8 +38,9 @@ public class CatalogBrandListEndpoint : IEndpoint<IResult>
     public async Task<IResult> HandleAsync()
     {
         var response = new ListCatalogBrandsResponse();
+        var repository = _catalogBrandRepository ?? throw new InvalidOperationException("Repository is required.");
 
-        var items = await _catalogBrandRepository.ListAsync();
+        var items = await repository.ListAsync();
 
         response.CatalogBrands.AddRange(items.Select(_mapper.Map<CatalogBrandDto>));
 

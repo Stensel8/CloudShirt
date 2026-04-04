@@ -49,7 +49,7 @@ builder.Services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
 
 var configSection = builder.Configuration.GetRequiredSection(BaseUrlConfiguration.CONFIG_NAME);
 builder.Services.Configure<BaseUrlConfiguration>(configSection);
-var baseUrlConfig = configSection.Get<BaseUrlConfiguration>();
+var baseUrlConfig = configSection.Get<BaseUrlConfiguration>() ?? new BaseUrlConfiguration();
 
 builder.Services.AddMemoryCache();
 

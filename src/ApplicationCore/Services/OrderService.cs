@@ -33,6 +33,7 @@ public class OrderService : IOrderService
         var basket = await _basketRepository.FirstOrDefaultAsync(basketSpec);
 
         Guard.Against.NullBasket(basketId, basket);
+        ArgumentNullException.ThrowIfNull(basket);
         Guard.Against.EmptyBasketOnCheckout(basket.Items);
 
         var catalogItemsSpecification = new CatalogItemsSpecification(basket.Items.Select(item => item.CatalogItemId).ToArray());

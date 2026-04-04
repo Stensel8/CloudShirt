@@ -19,6 +19,8 @@ public class CatalogItemListPagedEndpoint
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
         var model = stringResponse.FromJson<CatalogIndexViewModel>();
+        Assert.IsNotNull(model);
+        Assert.IsNotNull(model.CatalogItems);
 
         Assert.AreEqual(10, model.CatalogItems.Count());
     }
@@ -35,12 +37,16 @@ public class CatalogItemListPagedEndpoint
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
         var model = stringResponse.FromJson<ListPagedCatalogItemResponse>();
+        Assert.IsNotNull(model);
+        Assert.IsNotNull(model.CatalogItems);
         var totalItem = model.CatalogItems.Count();
 
         var response2 = await client.GetAsync($"/api/catalog-items?pageSize={pageSize}&pageIndex={pageIndex}");
         response.EnsureSuccessStatusCode();
         var stringResponse2 = await response2.Content.ReadAsStringAsync();
         var model2 = stringResponse2.FromJson<ListPagedCatalogItemResponse>();
+        Assert.IsNotNull(model2);
+        Assert.IsNotNull(model2.CatalogItems);
 
         var totalExpected = Math.Min(pageSize, Math.Max(0, totalItem - (pageSize * pageIndex)));
 

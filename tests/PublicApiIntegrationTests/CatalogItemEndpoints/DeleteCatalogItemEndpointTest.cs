@@ -20,6 +20,7 @@ public class DeleteCatalogItemEndpointTest
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
         var model = stringResponse.FromJson<DeleteCatalogItemResponse>();
+        Assert.IsNotNull(model);
 
         Assert.AreEqual("Deleted", model.Status);
     }

@@ -43,6 +43,8 @@ public class CreateCatalogItemEndpointTest
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
         var model = stringResponse.FromJson<CreateCatalogItemResponse>();
+        Assert.IsNotNull(model);
+        Assert.IsNotNull(model.CatalogItem);
 
         Assert.AreEqual(_testBrandId, model.CatalogItem.CatalogBrandId);
         Assert.AreEqual(_testTypeId, model.CatalogItem.CatalogTypeId);

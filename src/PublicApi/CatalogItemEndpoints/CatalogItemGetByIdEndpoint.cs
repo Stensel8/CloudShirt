@@ -13,7 +13,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class CatalogItemGetByIdEndpoint : IEndpoint<IResult, GetByIdCatalogItemRequest>
 {
-    private IRepository<CatalogItem> _itemRepository;
+    private IRepository<CatalogItem>? _itemRepository;
     private readonly IUriComposer _uriComposer;
 
     public CatalogItemGetByIdEndpoint(IUriComposer uriComposer)
@@ -36,8 +36,9 @@ public class CatalogItemGetByIdEndpoint : IEndpoint<IResult, GetByIdCatalogItemR
     public async Task<IResult> HandleAsync(GetByIdCatalogItemRequest request)
     {
         var response = new GetByIdCatalogItemResponse(request.CorrelationId());
+        var repository = _itemRepository ?? throw new InvalidOperationException("Repository is required.");
 
-        var item = await _itemRepository.GetByIdAsync(request.CatalogItemId);
+        var item = await repository.GetByIdAsync(request.CatalogItemId);
         if (item is null)
             return Results.NotFound();
 

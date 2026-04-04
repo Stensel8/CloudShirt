@@ -4,5 +4,5 @@ namespace BlazorShared.Attributes;
 
 public class EndpointAttribute : Attribute
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 }

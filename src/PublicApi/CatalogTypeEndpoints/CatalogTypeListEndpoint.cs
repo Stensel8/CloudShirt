@@ -15,7 +15,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogTypeEndpoints;
 /// </summary>
 public class CatalogTypeListEndpoint : IEndpoint<IResult>
 {
-    private IRepository<CatalogType> _catalogTypeRepository;
+    private IRepository<CatalogType>? _catalogTypeRepository;
     private readonly IMapper _mapper;
 
     public CatalogTypeListEndpoint(IMapper mapper)
@@ -38,8 +38,9 @@ public class CatalogTypeListEndpoint : IEndpoint<IResult>
     public async Task<IResult> HandleAsync()
     {
         var response = new ListCatalogTypesResponse();
+        var repository = _catalogTypeRepository ?? throw new InvalidOperationException("Repository is required.");
 
-        var items = await _catalogTypeRepository.ListAsync();
+        var items = await repository.ListAsync();
 
         response.CatalogTypes.AddRange(items.Select(_mapper.Map<CatalogTypeDto>));
 

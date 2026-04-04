@@ -76,7 +76,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Close">Cancel</button>
-                <button class="btn btn-danger" @onclick="() => DeleteClick(_item.Id)">
+                <button class="btn btn-danger" @onclick="() => DeleteClick(_item?.Id ?? 0)">
                     Delete
                 </button>
             </div>
@@ -92,14 +92,14 @@
 
 @code {
     [Parameter]
-    public IEnumerable<CatalogBrand> Brands { get; set; }
+    public IEnumerable<CatalogBrand> Brands { get; set; } = [];
     [Parameter]
-    public IEnumerable<CatalogType> Types { get; set; }
+    public IEnumerable<CatalogType> Types { get; set; } = [];
 
     [Parameter]
     public EventCallback<string> OnSaveClick { get; set; }
 
-    private bool HasPicture => !string.IsNullOrEmpty(_item.PictureUri);
+    private bool HasPicture => !string.IsNullOrEmpty(_item?.PictureUri);
     private string _modalDisplay = "none;";
     private string _modalClass = "";
     private bool _showDeleteModal = false;
@@ -121,7 +121,7 @@
 
         await new Css(JSRuntime).HideBodyOverflow();
 
-        _item = await CatalogItemService.GetById(id);
+        _item = await CatalogItemService.GetById(id) ?? new CatalogItem();
 
         _modalDisplay = "block;";
         _modalClass = "Show";

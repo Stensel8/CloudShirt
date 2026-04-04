@@ -6,9 +6,9 @@ namespace Microsoft.eShopWeb.ApplicationCore.Entities.BuyerAggregate;
 
 public class Buyer : BaseEntity, IAggregateRoot
 {
-    public string IdentityGuid { get; private set; }
+    public string IdentityGuid { get; private set; } = string.Empty;
 
-    private List<PaymentMethod> _paymentMethods = new List<PaymentMethod>();
+    private readonly List<PaymentMethod> _paymentMethods = [];
 
     public IEnumerable<PaymentMethod> PaymentMethods => _paymentMethods.AsReadOnly();
 

@@ -15,7 +15,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class DeleteCatalogItemEndpoint : IEndpoint<IResult, DeleteCatalogItemRequest>
 {
-    private IRepository<CatalogItem> _itemRepository;
+    private IRepository<CatalogItem>? _itemRepository;
 
     public void AddRoute(IEndpointRouteBuilder app)
     {
@@ -33,12 +33,13 @@ public class DeleteCatalogItemEndpoint : IEndpoint<IResult, DeleteCatalogItemReq
     public async Task<IResult> HandleAsync(DeleteCatalogItemRequest request)
     {
         var response = new DeleteCatalogItemResponse(request.CorrelationId());
+        var repository = _itemRepository ?? throw new InvalidOperationException("Repository is required.");
 
-        var itemToDelete = await _itemRepository.GetByIdAsync(request.CatalogItemId);
+        var itemToDelete = await repository.GetByIdAsync(request.CatalogItemId);
         if (itemToDelete is null)
             return Results.NotFound();
 
-        await _itemRepository.DeleteAsync(itemToDelete);
+        await repository.DeleteAsync(itemToDelete);
 
         return Results.Ok(response);
     }

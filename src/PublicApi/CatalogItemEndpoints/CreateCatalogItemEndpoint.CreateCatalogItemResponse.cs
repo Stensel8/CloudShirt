@@ -12,5 +12,5 @@ public class CreateCatalogItemResponse : BaseResponse
     {
     }
 
-    public CatalogItemDto CatalogItem { get; set; }
+    public CatalogItemDto CatalogItem { get; set; } = new();
 }

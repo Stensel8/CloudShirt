@@ -109,9 +109,9 @@
 
 @code {
     [Parameter]
-    public IEnumerable<CatalogBrand> Brands { get; set; }
+    public IEnumerable<CatalogBrand> Brands { get; set; } = [];
     [Parameter]
-    public IEnumerable<CatalogType> Types { get; set; }
+    public IEnumerable<CatalogType> Types { get; set; } = [];
 
     [Parameter]
     public EventCallback<string> OnSaveClick { get; set; }
@@ -137,7 +137,7 @@
 
         await new Css(JSRuntime).HideBodyOverflow();
 
-        _item = await CatalogItemService.GetById(id);
+        _item = await CatalogItemService.GetById(id) ?? new CatalogItem();
 
         _modalDisplay = "block;";
         _modalClass = "Show";

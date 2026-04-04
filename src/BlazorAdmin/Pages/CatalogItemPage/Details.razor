@@ -95,14 +95,14 @@
 
 @code {
     [Parameter]
-    public IEnumerable<CatalogBrand> Brands { get; set; }
+    public IEnumerable<CatalogBrand> Brands { get; set; } = [];
     [Parameter]
-    public IEnumerable<CatalogType> Types { get; set; }
+    public IEnumerable<CatalogType> Types { get; set; } = [];
 
     [Parameter]
     public EventCallback<int> OnEditClick { get; set; }
 
-    private bool HasPicture => !string.IsNullOrEmpty(_item.PictureUri);
+    private bool HasPicture => !string.IsNullOrEmpty(_item?.PictureUri);
     private string _modalDisplay = "none;";
     private string _modalClass = "";
     private bool _showDetailsModal = false;
@@ -121,7 +121,7 @@
 
         await new Css(JSRuntime).HideBodyOverflow();
 
-        _item = await CatalogItemService.GetById(id);
+        _item = await CatalogItemService.GetById(id) ?? new CatalogItem();
 
         _modalDisplay = "block;";
         _modalClass = "Show";

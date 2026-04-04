@@ -29,17 +29,19 @@ public class CatalogItemService : ICatalogItemService
     public async Task<CatalogItem> Create(CreateCatalogItemRequest catalogItem)
     {
         var response = await _httpService.HttpPost<CreateCatalogItemResponse>("catalog-items", catalogItem);
-        return response?.CatalogItem;
+        return response?.CatalogItem ?? new CatalogItem();
     }
 
     public async Task<CatalogItem> Edit(CatalogItem catalogItem)
     {
-        return (await _httpService.HttpPut<EditCatalogItemResult>("catalog-items", catalogItem)).CatalogItem;
+        var response = await _httpService.HttpPut<EditCatalogItemResult>("catalog-items", catalogItem);
+        return response?.CatalogItem ?? catalogItem;
     }
 
     public async Task<string> Delete(int catalogItemId)
     {
-        return (await _httpService.HttpDelete<DeleteCatalogItemResponse>("catalog-items", catalogItemId)).Status;
+        var response = await _httpService.HttpDelete<DeleteCatalogItemResponse>("catalog-items", catalogItemId);
+        return response?.Status ?? "Failed";
     }
 
     public async Task<CatalogItem> GetById(int id)
@@ -50,9 +52,9 @@ public class CatalogItemService : ICatalogItemService
         await Task.WhenAll(brandListTask, typeListTask, itemGetTask);
         var brands = brandListTask.Result;
         var types = typeListTask.Result;
-        var catalogItem = itemGetTask.Result.CatalogItem;
-        catalogItem.CatalogBrand = brands.FirstOrDefault(b => b.Id == catalogItem.CatalogBrandId)?.Name;
-        catalogItem.CatalogType = types.FirstOrDefault(t => t.Id == catalogItem.CatalogTypeId)?.Name;
+        var catalogItem = itemGetTask.Result?.CatalogItem ?? new CatalogItem();
+        catalogItem.CatalogBrand = brands.FirstOrDefault(b => b.Id == catalogItem.CatalogBrandId)?.Name ?? string.Empty;
+        catalogItem.CatalogType = types.FirstOrDefault(t => t.Id == catalogItem.CatalogTypeId)?.Name ?? string.Empty;
         return catalogItem;
     }
 
@@ -66,11 +68,11 @@ public class CatalogItemService : ICatalogItemService
         await Task.WhenAll(brandListTask, typeListTask, itemListTask);
         var brands = brandListTask.Result;
         var types = typeListTask.Result;
-        var items = itemListTask.Result.CatalogItems;
+        var items = itemListTask.Result?.CatalogItems ?? [];
         foreach (var item in items)
         {
-            item.CatalogBrand = brands.FirstOrDefault(b => b.Id == item.CatalogBrandId)?.Name;
-            item.CatalogType = types.FirstOrDefault(t => t.Id == item.CatalogTypeId)?.Name;
+            item.CatalogBrand = brands.FirstOrDefault(b => b.Id == item.CatalogBrandId)?.Name ?? string.Empty;
+            item.CatalogType = types.FirstOrDefault(t => t.Id == item.CatalogTypeId)?.Name ?? string.Empty;
         }
         return items;
     }
@@ -85,11 +87,11 @@ public class CatalogItemService : ICatalogItemService
         await Task.WhenAll(brandListTask, typeListTask, itemListTask);
         var brands = brandListTask.Result;
         var types = typeListTask.Result;
-        var items = itemListTask.Result.CatalogItems;
+        var items = itemListTask.Result?.CatalogItems ?? [];
         foreach (var item in items)
         {
-            item.CatalogBrand = brands.FirstOrDefault(b => b.Id == item.CatalogBrandId)?.Name;
-            item.CatalogType = types.FirstOrDefault(t => t.Id == item.CatalogTypeId)?.Name;
+            item.CatalogBrand = brands.FirstOrDefault(b => b.Id == item.CatalogBrandId)?.Name ?? string.Empty;
+            item.CatalogType = types.FirstOrDefault(t => t.Id == item.CatalogTypeId)?.Name ?? string.Empty;
         }
         return items;
     }

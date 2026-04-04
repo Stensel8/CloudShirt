@@ -36,13 +36,13 @@ public class UpdateDetails
     [Fact]
     public void ThrowsArgumentNullExceptionGivenNullName()
     {
-        Assert.Throws<ArgumentNullException>(() => _testItem.UpdateDetails(null, _validDescription, _validPrice));
+        Assert.Throws<ArgumentNullException>(() => _testItem.UpdateDetails(null!, _validDescription, _validPrice));
     }
 
     [Fact]
     public void ThrowsArgumentNullExceptionGivenNullDescription()
     {
-        Assert.Throws<ArgumentNullException>(() => _testItem.UpdateDetails(_validName, null, _validPrice));
+        Assert.Throws<ArgumentNullException>(() => _testItem.UpdateDetails(_validName, null!, _validPrice));
     }
 
     [Theory]

@@ -34,10 +34,10 @@ public class CatalogLookupDataService<TLookupData, TReponse>
 
     public async Task<List<TLookupData>> List()
     {
-        var endpointName = typeof(TLookupData).GetCustomAttribute<EndpointAttribute>().Name;
+        var endpointName = typeof(TLookupData).GetCustomAttribute<EndpointAttribute>()?.Name ?? string.Empty;
         _logger.LogInformation($"Fetching {typeof(TLookupData).Name} from API. Enpoint : {endpointName}");
 
         var response = await _httpClient.GetFromJsonAsync<TReponse>($"{_apiUrl}{endpointName}");
-        return response.List;
+        return response?.List ?? [];
     }
 }

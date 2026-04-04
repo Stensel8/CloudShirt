@@ -17,7 +17,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogItemRequest>
 {
-    private IRepository<CatalogItem> _itemRepository;
+    private IRepository<CatalogItem>? _itemRepository;
     private readonly IUriComposer _uriComposer;
     private readonly IMapper _mapper;
 
@@ -42,17 +42,18 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
     public async Task<IResult> HandleAsync(ListPagedCatalogItemRequest request)
     {
         var response = new ListPagedCatalogItemResponse(request.CorrelationId());
+        var repository = _itemRepository ?? throw new InvalidOperationException("Repository is required.");
 
         var filterSpec = new CatalogFilterSpecification(request.CatalogBrandId, request.CatalogTypeId);
-        int totalItems = await _itemRepository.CountAsync(filterSpec);
+        int totalItems = await repository.CountAsync(filterSpec);
 
         var pagedSpec = new CatalogFilterPaginatedSpecification(
-            skip: request.PageIndex.Value * request.PageSize.Value,
-            take: request.PageSize.Value,
+            skip: request.PageIndex.GetValueOrDefault() * request.PageSize.GetValueOrDefault(),
+            take: request.PageSize.GetValueOrDefault(),
             brandId: request.CatalogBrandId,
             typeId: request.CatalogTypeId);
 
-        var items = await _itemRepository.ListAsync(pagedSpec);
+        var items = await repository.ListAsync(pagedSpec);
 
         response.CatalogItems.AddRange(items.Select(_mapper.Map<CatalogItemDto>));
         foreach (CatalogItemDto item in response.CatalogItems)
@@ -62,7 +63,7 @@ public class CatalogItemListPagedEndpoint : IEndpoint<IResult, ListPagedCatalogI
 
         if (request.PageSize > 0)
         {
-            response.PageCount = int.Parse(Math.Ceiling((decimal)totalItems / request.PageSize.Value).ToString());
+            response.PageCount = int.Parse(Math.Ceiling((decimal)totalItems / request.PageSize.GetValueOrDefault()).ToString());
         }
         else
         {

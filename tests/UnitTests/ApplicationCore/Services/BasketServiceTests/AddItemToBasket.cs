@@ -5,6 +5,7 @@ using Microsoft.eShopWeb.ApplicationCore.Services;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
 using Moq;
 using Xunit;
+using TestAppLogger = Microsoft.eShopWeb.UnitTests.Builders.TestAppLogger<Microsoft.eShopWeb.ApplicationCore.Services.BasketService>;
 
 namespace Microsoft.eShopWeb.UnitTests.ApplicationCore.Services.BasketServiceTests;
 
@@ -20,7 +21,7 @@ public class AddItemToBasket
         basket.AddItem(1, It.IsAny<decimal>(), It.IsAny<int>());
         _mockBasketRepo.Setup(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default)).ReturnsAsync(basket);
 
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
 
         await basketService.AddItemToBasket(basket.BuyerId, 1, 1.50m);
 
@@ -34,7 +35,7 @@ public class AddItemToBasket
         basket.AddItem(1, It.IsAny<decimal>(), It.IsAny<int>());
         _mockBasketRepo.Setup(x => x.FirstOrDefaultAsync(It.IsAny<BasketWithItemsSpecification>(), default)).ReturnsAsync(basket);
 
-        var basketService = new BasketService(_mockBasketRepo.Object, null);
+        var basketService = new BasketService(_mockBasketRepo.Object, new TestAppLogger());
 
         await basketService.AddItemToBasket(basket.BuyerId, 1, 1.50m);
 

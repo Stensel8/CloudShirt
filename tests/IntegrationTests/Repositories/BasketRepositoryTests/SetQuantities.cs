@@ -7,6 +7,7 @@ using Microsoft.eShopWeb.ApplicationCore.Services;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.UnitTests.Builders;
 using Xunit;
+using TestAppLogger = Microsoft.eShopWeb.UnitTests.Builders.TestAppLogger<Microsoft.eShopWeb.ApplicationCore.Services.BasketService>;
 
 namespace Microsoft.eShopWeb.IntegrationTests.Repositories.BasketRepositoryTests;
 
@@ -29,7 +30,7 @@ public class SetQuantities
     public async Task RemoveEmptyQuantities()
     {
         var basket = BasketBuilder.WithOneBasketItem();
-        var basketService = new BasketService(_basketRepository, null);
+        var basketService = new BasketService(_basketRepository, new TestAppLogger());
         await _basketRepository.AddAsync(basket);
         _catalogContext.SaveChanges();
 

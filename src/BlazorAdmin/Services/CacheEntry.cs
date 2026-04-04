@@ -13,6 +13,6 @@ public class CacheEntry<T>
 
     }
 
-    public T Value { get; set; }
+    public T Value { get; set; } = default!;
     public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 }

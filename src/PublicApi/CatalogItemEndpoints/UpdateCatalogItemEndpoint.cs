@@ -15,7 +15,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints;
 /// </summary>
 public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemRequest>
 {
-    private IRepository<CatalogItem> _itemRepository;
+    private IRepository<CatalogItem>? _itemRepository;
     private readonly IUriComposer _uriComposer;
 
     public UpdateCatalogItemEndpoint(IUriComposer uriComposer)
@@ -39,14 +39,19 @@ public class UpdateCatalogItemEndpoint : IEndpoint<IResult, UpdateCatalogItemReq
     public async Task<IResult> HandleAsync(UpdateCatalogItemRequest request)
     {
         var response = new UpdateCatalogItemResponse(request.CorrelationId());
+        var repository = _itemRepository ?? throw new InvalidOperationException("Repository is required.");
 
-        var existingItem = await _itemRepository.GetByIdAsync(request.Id);
+        var existingItem = await repository.GetByIdAsync(request.Id);
+        if (existingItem is null)
+        {
+            return Results.NotFound();
+        }
 
         existingItem.UpdateDetails(request.Name, request.Description, request.Price);
         existingItem.UpdateBrand(request.CatalogBrandId);
         existingItem.UpdateType(request.CatalogTypeId);
 
-        await _itemRepository.UpdateAsync(existingItem);
+        await repository.UpdateAsync(existingItem);
 
         var dto = new CatalogItemDto
         {

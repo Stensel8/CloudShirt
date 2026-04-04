@@ -35,11 +35,13 @@ public class GetById
         _output.WriteLine($"OrderId: {orderId}");
 
         var orderFromRepo = await _orderRepository.GetByIdAsync(orderId);
+        Assert.NotNull(orderFromRepo);
         Assert.Equal(OrderBuilder.TestBuyerId, orderFromRepo.BuyerId);
 
         // Note: Using InMemoryDatabase OrderItems is available. Will be null if using SQL DB.
         // Use the OrderWithItemsByIdSpec instead of just GetById to get the full aggregate
         var firstItem = orderFromRepo.OrderItems.FirstOrDefault();
+        Assert.NotNull(firstItem);
         Assert.Equal(OrderBuilder.TestUnits, firstItem.Units);
     }
 }

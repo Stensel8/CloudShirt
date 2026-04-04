@@ -17,7 +17,7 @@
             <Authorized>
                 <li class="nav-item px-3">
                     <NavLink class="nav-link" href="manage/my-account" Match="NavLinkMatch.All">
-                        <span class="oi oi-person" aria-hidden="true"></span>                         @context.User.Identity.Name
+                        <span class="oi oi-person" aria-hidden="true"></span>                         @context.User.Identity?.Name
 
                     </NavLink>
                 </li>
@@ -35,7 +35,7 @@
 
     private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {

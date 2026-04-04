@@ -9,7 +9,10 @@ public class BasketConfiguration : IEntityTypeConfiguration<Basket>
     public void Configure(EntityTypeBuilder<Basket> builder)
     {
         var navigation = builder.Metadata.FindNavigation(nameof(Basket.Items));
-        navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
+        if (navigation is not null)
+        {
+            navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
+        }
 
         builder.Property(b => b.BuyerId)
             .IsRequired()

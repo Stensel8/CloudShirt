@@ -107,9 +107,9 @@
 @code {
 
         [Parameter]
-        public IEnumerable<CatalogBrand> Brands { get; set; }
+        public IEnumerable<CatalogBrand> Brands { get; set; } = [];
         [Parameter]
-        public IEnumerable<CatalogType> Types { get; set; }
+        public IEnumerable<CatalogType> Types { get; set; } = [];
 
         [Parameter]
         public EventCallback<string> OnSaveClick { get; set; }
@@ -141,8 +141,8 @@
 
         _item = new CreateCatalogItemRequest
         {
-            CatalogTypeId = Types.First().Id,
-            CatalogBrandId = Brands.First().Id
+            CatalogTypeId = Types.FirstOrDefault()?.Id ?? 0,
+            CatalogBrandId = Brands.FirstOrDefault()?.Id ?? 0
         };
 
         _modalDisplay = "block;";

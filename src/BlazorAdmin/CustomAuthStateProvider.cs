@@ -49,7 +49,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
     private async Task<ClaimsPrincipal> FetchUser()
     {
-        UserInfo user = null;
+        UserInfo? user = null;
 
         try
         {

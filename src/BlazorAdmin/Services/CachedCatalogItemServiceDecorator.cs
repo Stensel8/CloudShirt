@@ -13,7 +13,7 @@ public class CachedCatalogItemServiceDecorator : ICatalogItemService
 {
     private readonly ILocalStorageService _localStorageService;
     private readonly CatalogItemService _catalogItemService;
-    private ILogger<CachedCatalogItemServiceDecorator> _logger;
+    private readonly ILogger<CachedCatalogItemServiceDecorator> _logger;
 
     public CachedCatalogItemServiceDecorator(ILocalStorageService localStorageService,
         CatalogItemService catalogItemService,
@@ -74,7 +74,7 @@ public class CachedCatalogItemServiceDecorator : ICatalogItemService
 
     public async Task<CatalogItem> GetById(int id)
     {
-        return (await List()).FirstOrDefault(x => x.Id == id);
+        return (await List()).FirstOrDefault(x => x.Id == id) ?? new CatalogItem();
     }
 
     public async Task<CatalogItem> Create(CreateCatalogItemRequest catalogItem)

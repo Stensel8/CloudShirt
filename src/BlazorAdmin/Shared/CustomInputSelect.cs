@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+using System.Globalization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorAdmin.Shared;
 
@@ -9,29 +11,38 @@ namespace BlazorAdmin.Shared;
 /// <typeparam name="TValue"></typeparam>
 public class CustomInputSelect<TValue> : InputSelect<TValue>
 {
-    protected override bool TryParseValueFromString(string value, out TValue result,
+    protected override bool TryParseValueFromString(string? value, out TValue result,
         out string validationErrorMessage)
     {
         if (typeof(TValue) == typeof(int))
         {
-            if (int.TryParse(value, out var resultInt))
+            var input = value ?? string.Empty;
+            if (int.TryParse(input, out var resultInt))
             {
                 result = (TValue)(object)resultInt;
-                validationErrorMessage = null;
+                validationErrorMessage = string.Empty;
                 return true;
             }
             else
             {
-                result = default;
+                result = default!;
                 validationErrorMessage =
-                    $"The selected value {value} is not a valid number.";
+                    $"The selected value {input} is not a valid number.";
                 return false;
             }
         }
         else
         {
-            return base.TryParseValueFromString(value, out result,
-                out validationErrorMessage);
+            if (BindConverter.TryConvertTo<TValue>(value, CultureInfo.CurrentCulture, out var parsedValue))
+            {
+                result = parsedValue!;
+                validationErrorMessage = string.Empty;
+                return true;
+            }
+
+            result = default!;
+            validationErrorMessage = $"The selected value {value} is not valid.";
+            return false;
         }
     }
 }

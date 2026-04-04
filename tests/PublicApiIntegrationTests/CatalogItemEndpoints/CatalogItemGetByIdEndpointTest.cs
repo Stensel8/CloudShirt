@@ -16,6 +16,8 @@ public class CatalogItemGetByIdEndpointTest
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
         var model = stringResponse.FromJson<GetByIdCatalogItemResponse>();
+        Assert.IsNotNull(model);
+        Assert.IsNotNull(model.CatalogItem);
 
         Assert.AreEqual(5, model.CatalogItem.Id);
         Assert.AreEqual("Roslyn Red Sheet", model.CatalogItem.Name);

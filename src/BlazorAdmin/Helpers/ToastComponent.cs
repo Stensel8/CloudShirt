@@ -11,17 +11,17 @@ public class ToastComponent : ComponentBase, IDisposable
     {
         get;
         set;
-    }
+    } = null!;
     protected string Heading
     {
         get;
         set;
-    }
+    } = string.Empty;
     protected string Message
     {
         get;
         set;
-    }
+    } = string.Empty;
     protected bool IsVisible
     {
         get;
@@ -31,12 +31,12 @@ public class ToastComponent : ComponentBase, IDisposable
     {
         get;
         set;
-    }
+    } = string.Empty;
     protected string IconCssClass
     {
         get;
         set;
-    }
+    } = string.Empty;
     protected override void OnInitialized()
     {
         ToastService.OnShow += ShowToast;
@@ -83,5 +83,6 @@ public class ToastComponent : ComponentBase, IDisposable
     public void Dispose()
     {
         ToastService.OnShow -= ShowToast;
+        ToastService.OnHide -= HideToast;
     }
 }

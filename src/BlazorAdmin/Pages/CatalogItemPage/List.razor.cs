@@ -9,22 +9,22 @@ namespace BlazorAdmin.Pages.CatalogItemPage;
 public partial class List : BlazorComponent
 {
     [Microsoft.AspNetCore.Components.Inject]
-    public ICatalogItemService CatalogItemService { get; set; }
+    public ICatalogItemService CatalogItemService { get; set; } = null!;
 
     [Microsoft.AspNetCore.Components.Inject]
-    public ICatalogLookupDataService<CatalogBrand> CatalogBrandService { get; set; }
+    public ICatalogLookupDataService<CatalogBrand> CatalogBrandService { get; set; } = null!;
 
     [Microsoft.AspNetCore.Components.Inject]
-    public ICatalogLookupDataService<CatalogType> CatalogTypeService { get; set; }
+    public ICatalogLookupDataService<CatalogType> CatalogTypeService { get; set; } = null!;
 
     private List<CatalogItem> catalogItems = new List<CatalogItem>();
     private List<CatalogType> catalogTypes = new List<CatalogType>();
     private List<CatalogBrand> catalogBrands = new List<CatalogBrand>();
 
-    private Edit EditComponent { get; set; }
-    private Delete DeleteComponent { get; set; }
-    private Details DetailsComponent { get; set; }
-    private Create CreateComponent { get; set; }
+    private Edit EditComponent { get; set; } = null!;
+    private Delete DeleteComponent { get; set; } = null!;
+    private Details DetailsComponent { get; set; } = null!;
+    private Create CreateComponent { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

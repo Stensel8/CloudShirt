@@ -28,6 +28,7 @@ public class AuthenticateEndpoint
         response.EnsureSuccessStatusCode();
         var stringResponse = await response.Content.ReadAsStringAsync();
         var model = stringResponse.FromJson<AuthenticateResponse>();
+        Assert.IsNotNull(model);
 
         Assert.AreEqual(expectedResult, model.Result);
     }
