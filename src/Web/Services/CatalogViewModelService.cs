@@ -83,6 +83,8 @@ public class CatalogViewModelService : ICatalogViewModelService
         var brands = await _brandRepository.ListAsync();
 
         var items = brands
+            .GroupBy(brand => brand.Brand, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.OrderBy(brand => brand.Id).First())
             .Select(brand => new SelectListItem() { Value = brand.Id.ToString(), Text = brand.Brand })
             .OrderBy(b => b.Text)
             .ToList();
@@ -99,6 +101,8 @@ public class CatalogViewModelService : ICatalogViewModelService
         var types = await _typeRepository.ListAsync();
 
         var items = types
+            .GroupBy(type => type.Type, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.OrderBy(type => type.Id).First())
             .Select(type => new SelectListItem() { Value = type.Id.ToString(), Text = type.Type })
             .OrderBy(t => t.Text)
             .ToList();

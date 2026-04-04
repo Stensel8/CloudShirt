@@ -20,6 +20,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var configSection = builder.Configuration.GetRequiredSection(BaseUrlConfiguration.CONFIG_NAME);
 builder.Services.Configure<BaseUrlConfiguration>(configSection);
 
+var baseUrlConfig = configSection.Get<BaseUrlConfiguration>() ?? new BaseUrlConfiguration();
+var resolvedApiBase = ResolveApiBase(baseUrlConfig.ApiBase, builder.HostEnvironment.BaseAddress);
+builder.Services.Configure<BaseUrlConfiguration>(options =>
+{
+    options.ApiBase = resolvedApiBase;
+    options.WebBase = baseUrlConfig.WebBase;
+});
+
 builder.Services.AddScoped(sp => new HttpClient() { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddScoped<ToastService>();
@@ -38,6 +46,31 @@ builder.Logging.AddConfiguration(builder.Configuration.GetRequiredSection("Loggi
 await ClearLocalStorageCache(builder.Services);
 
 await builder.Build().RunAsync();
+
+static string ResolveApiBase(string configuredApiBase, string hostBaseAddress)
+{
+    if (!Uri.TryCreate(hostBaseAddress, UriKind.Absolute, out var hostUri))
+    {
+        return configuredApiBase;
+    }
+
+    if (!string.Equals(hostUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
+    {
+        return configuredApiBase;
+    }
+
+    if (hostUri.Scheme == Uri.UriSchemeHttp && hostUri.Port == 5106)
+    {
+        return "http://localhost:5200/api/";
+    }
+
+    if (hostUri.Scheme == Uri.UriSchemeHttps && hostUri.Port == 5001)
+    {
+        return "https://localhost:5099/api/";
+    }
+
+    return configuredApiBase;
+}
 
 static async Task ClearLocalStorageCache(IServiceCollection services)
 {
