@@ -68,7 +68,7 @@ services:
   # Stap 3 - Database
   db:
     container_name: cloudshirt-dotnet-db
-    image: postgres:alpine
+    image: postgres:18-alpine
     ports:
       # Hostpoort 5432 -> containerpoort 5432
       - "5432:5432"
