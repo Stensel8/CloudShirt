@@ -177,6 +177,10 @@ public class CatalogContextSeed
         await catalogContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Extracts the numeric product image identifier from a picture URI filename (for example, "12.avif" -> 12).
+    /// Used to match existing persisted catalog rows to canonical seeded rows during synchronization.
+    /// </summary>
     static int? GetProductImageNumber(string uri)
     {
         var fileName = GetPictureFileName(uri);
@@ -185,6 +189,10 @@ public class CatalogContextSeed
         return int.TryParse(fileStem, out var imageNumber) ? imageNumber : null;
     }
 
+    /// <summary>
+    /// Extracts the filename segment from a URI/path, normalizing path separators and removing query-string parts.
+    /// This keeps image-number extraction stable across URL formats and persisted variations.
+    /// </summary>
     static string GetPictureFileName(string uri)
     {
         var normalized = uri.Replace('\\', '/');
