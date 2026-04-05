@@ -21,7 +21,7 @@ public class CatalogFilterSpecification
 
         var result = GetTestItemCollection()
             .AsQueryable()
-            .Where(spec.WhereExpressions.FirstOrDefault().Filter);
+            .Where(spec.WhereExpressions.First().Filter);
 
         Assert.Equal(expectedCount, result.Count());
     }
