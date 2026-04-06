@@ -2,11 +2,11 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "main", "NET-10" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "NET-10" ]
+    branches: [ "main" ]
   schedule:
-    - cron: '44 16 * * 5'
+    - cron: '0 4 * * *'
 
 jobs:
   analyze-csharp:
