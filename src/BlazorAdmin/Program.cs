@@ -54,22 +54,19 @@ static string ResolveApiBase(string configuredApiBase, string hostBaseAddress)
         return configuredApiBase;
     }
 
-    if (!string.Equals(hostUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
+    if (string.Equals(hostUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
     {
+        if (hostUri.Scheme == Uri.UriSchemeHttp && hostUri.Port == 5106)
+            return "http://localhost:5200/api/";
+
+        if (hostUri.Scheme == Uri.UriSchemeHttps && hostUri.Port == 5001)
+            return "https://localhost:5099/api/";
+
         return configuredApiBase;
     }
 
-    if (hostUri.Scheme == Uri.UriSchemeHttp && hostUri.Port == 5106)
-    {
-        return "http://localhost:5200/api/";
-    }
-
-    if (hostUri.Scheme == Uri.UriSchemeHttps && hostUri.Port == 5001)
-    {
-        return "https://localhost:5099/api/";
-    }
-
-    return configuredApiBase;
+    // Productie: API zit op dezelfde host als de browser (ALB, EC2, etc.)
+    return $"{hostUri.Scheme}://{hostUri.Authority}/api/";
 }
 
 static async Task ClearLocalStorageCache(IServiceCollection services)
