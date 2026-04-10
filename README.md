@@ -63,3 +63,31 @@ Dit project laat zien dat dezelfde business-app werkt als:
 
 - .NET monoliet
 - .NET microservices
+
+## Gerelateerde repositories
+
+Dit project maakt deel uit van een driehoek van samenhangende repo's:
+
+| Repository | Rol |
+|------------|-----|
+| **[Stensel8/CloudShirt](https://github.com/Stensel8/CloudShirt)** *(deze repo)* | .NET-applicatie — monoliet én microservices; basis voor Assignment 1 |
+| [Stensel8/CloudShirt-Hugo](https://github.com/Stensel8/CloudShirt-Hugo) | Go/Hugo-variant van dezelfde use-case; gebruikt in Assignment 2 (Docker Swarm) |
+| [stensel8/cloud-engineering](https://github.com/stensel8/cloud-engineering/tree/main/cloud-automation-concepts) | Schoolopdracht IaC (AWS/Terraform/Ansible) waarvoor beide apps zijn gebouwd |
+
+CloudShirt staat als git submodule in de cloud-engineering repo, zodat de koppeling versievast blijft.
+
+## Credits
+
+Dit project is gemaakt door **[Stensel8](https://github.com/Stensel8)** en **[Hintenhaus04](https://github.com/Hintenhaus04)** als schoolopdracht (Cloud Engineering, jaar 3). De opdracht vroeg om een IaC-infrastructuur op AWS op te zetten met eigen gedockerized applicaties — dat werd de aanleiding om zelf twee apps te bouwen.
+
+### Upstreams & inspiratie
+
+| Bron | Beschrijving |
+|------|-------------|
+| [looking4ward/CloudShirt](https://github.com/looking4ward/CloudShirt) | Upstream van de docent, als startpunt voor deze opdracht |
+| [NimblePros/eShopOnWeb](https://github.com/NimblePros/eShopOnWeb) | Onderhouden fork van eShopOnWeb door een .NET-community maintainer |
+| [dotnet-architecture/eShopOnWeb](https://github.com/dotnet-architecture/eShopOnWeb) | Originele Microsoft demo-applicatie (deprecated / end-of-life) |
+
+### Tooling
+
+- Ontwikkeld met hulp van **[Claude Code](https://claude.ai/code)** (Anthropic) als AI-assistent bij de implementatie.
