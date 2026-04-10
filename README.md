@@ -1,5 +1,8 @@
 # CloudShirt (.NET)
 
+> [!WARNING]
+> **Deprecated vanaf juni 2026.** Deze applicatie is puur gebouwd als schooldemo en wordt niet verder doorontwikkeld. De repository wordt niet meer onderhouden.
+
 Demo-project voor school met dezelfde app in twee .NET-architecturen:
 
 - Monoliet (lokaal, zonder app-containers)
@@ -70,7 +73,7 @@ Dit project maakt deel uit van een driehoek van samenhangende repo's:
 
 | Repository | Rol |
 |------------|-----|
-| **[Stensel8/CloudShirt](https://github.com/Stensel8/CloudShirt)** *(deze repo)* | .NET-applicatie — monoliet én microservices; basis voor Assignment 1 |
+| **[Stensel8/CloudShirt](https://github.com/Stensel8/CloudShirt)** *(deze repo)* | .NET-applicatie - monoliet én microservices; basis voor Assignment 1 |
 | [Stensel8/CloudShirt-Hugo](https://github.com/Stensel8/CloudShirt-Hugo) | Go/Hugo-variant van dezelfde use-case; gebruikt in Assignment 2 (Docker Swarm) |
 | [stensel8/cloud-engineering](https://github.com/stensel8/cloud-engineering/tree/main/cloud-automation-concepts) | Schoolopdracht IaC (AWS/Terraform/Ansible) waarvoor beide apps zijn gebouwd |
 
@@ -78,7 +81,7 @@ CloudShirt staat als git submodule in de cloud-engineering repo, zodat de koppel
 
 ## Credits
 
-Dit project is gemaakt door **[Stensel8](https://github.com/Stensel8)** en **[Hintenhaus04](https://github.com/Hintenhaus04)** als schoolopdracht (Cloud Engineering, jaar 3). De opdracht vroeg om een IaC-infrastructuur op AWS op te zetten met eigen gedockerized applicaties — dat werd de aanleiding om zelf twee apps te bouwen.
+Dit project is gemaakt door **[Stensel8](https://github.com/Stensel8)** en **[Hintenhaus04](https://github.com/Hintenhaus04)** als schoolopdracht (Cloud Engineering, jaar 3). De opdracht vroeg om een IaC-infrastructuur op AWS op te zetten met eigen gedockerized applicaties - dat werd de aanleiding om zelf twee apps te bouwen.
 
 ### Upstreams & inspiratie
 
