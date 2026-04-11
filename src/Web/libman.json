@@ -19,7 +19,7 @@
       "destination": "wwwroot/lib/bootstrap/dist/"
     },
     {
-      "library": "jquery-validation-unobtrusive@3.2.10",
+      "library": "jquery-validation-unobtrusive@3.2.12",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
