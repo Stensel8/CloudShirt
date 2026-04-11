@@ -35,7 +35,7 @@
       "destination": "wwwroot/lib/toastr/"
     },
     {
-      "library": "aspnet-signalr@1.0.3",
+      "library": "aspnet-signalr@1.1.4",
       "files": [
         "signalr.js",
         "signalr.min.js"
