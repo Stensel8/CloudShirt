@@ -57,6 +57,7 @@
     <None Include="wwwroot\images\products\9.avif" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="NuGet.Packaging" Version="6.12.5" />
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
